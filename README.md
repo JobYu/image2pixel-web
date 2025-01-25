@@ -42,7 +42,7 @@ web/
 Simply clone the repository and open `web/index.html` in your browser. No build process or dependencies required.
 
 ```bash
-git clone https://https://github.com/JobYu/pixel-art-converter.git
+git clone htts：//github.com/JobYu/pixel-art-converter.git
 ```
 
 ## Version
