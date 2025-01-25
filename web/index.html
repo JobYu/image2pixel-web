@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Art Converter</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Pixel Art Converter <span class="version">v1.0.0</span></h1>
+        <div class="logo">
+            <img src="Image2pixel.png" alt="Pixel Art Converter Logo">
+        </div>
+        <div class="description">
+            <p>A simple tool to convert your images into pixel art style.</p>
+            <div class="help-icon" title="How to use:
+1. Click 'Open' to select an image
+2. Adjust 'Block Size' to control pixel size
+3. Adjust 'Color Count' to set the number of colors
+4. Click 'Save' to download your pixel art">?</div>
+        </div>
+        <div class="controls-row">
+            <label for="imageInput" class="button">Open</label>
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+            <button onclick="saveImage()" class="button">Save</button>
+            
+            <div class="control-item">
+                <label for="blockSize">Block Size:</label>
+                <div class="slider-container">
+                    <input type="range" id="blockSize" min="2" max="10" value="2">
+                    <input type="number" id="blockSizeInput" class="number-input" min="2" max="10" value="2">
+                </div>
+            </div>
+            
+            <div class="control-item">
+                <label for="colorCount">Color Count:</label>
+                <div class="slider-container">
+                    <input type="range" id="colorCount" min="2" max="64" value="32">
+                    <input type="number" id="colorCountInput" class="number-input" min="2" max="64" value="32">
+                </div>
+            </div>
+        </div>
+        <div class="preview">
+            <div class="original">
+                <h3>Original Image</h3>
+                <div id="originalImageContainer" class="image-container"></div>
+            </div>
+            <div class="result">
+                <h3>Pixel Art</h3>
+                <canvas id="resultCanvas"></canvas>
+            </div>
+        </div>
+        <footer class="copyright">
+            <p>&copy; 2024 <a href="https://32comic.com" target="_blank" rel="noopener">32comic.com</a> Pixel Art Converter. All rights reserved.</p>
+        </footer>
+    </div>
+    <script src="js/main.js"></script>
+</body>
+</html>
