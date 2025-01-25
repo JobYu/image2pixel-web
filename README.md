@@ -12,6 +12,7 @@ A simple web-based tool that converts images into pixel art style.
 - Customizable color palette (2-64 colors)
 - Download results as PNG
 - No installation required - works in browser
+- Improved mobile viewing experience
 
 ## How to Use
 
@@ -47,7 +48,21 @@ git clone https://https://github.com/JobYu/pixel-art-converter.git
 
 ## Version
 
-Current version: v1.0.0
+Current version: v1.0.1
+
+- Added CSS media query to hide the original image container on mobile screens (width <= 768px)
+- Adjusted the result container to take full width and provide better height utilization
+- Improved mobile viewing experience by focusing on the converted result
+
+v1.0.0
+
+- Easy-to-use interface
+- Real-time preview
+- Adjustable pixel block size (2-10 pixels)
+- Customizable color palette (2-64 colors)
+- Download results as PNG
+- No installation required - works in browser
+
 
 ## License
 
