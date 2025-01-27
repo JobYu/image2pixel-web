@@ -196,23 +196,93 @@ function colorDistance(color1, color2) {
     );
 }
 
-// Process image function
+// Add this new function to detect background color
+function detectBackgroundColor(imageData) {
+    const data = imageData.data;
+    const corners = [
+        [0, 0],
+        [0, imageData.height - 1],
+        [imageData.width - 1, 0],
+        [imageData.width - 1, imageData.height - 1]
+    ];
+    
+    let r = 0, g = 0, b = 0;
+    corners.forEach(([x, y]) => {
+        const idx = (y * imageData.width + x) * 4;
+        r += data[idx];
+        g += data[idx + 1];
+        b += data[idx + 2];
+    });
+    
+    return [
+        Math.round(r / 4),
+        Math.round(g / 4),
+        Math.round(b / 4)
+    ];
+}
+
+// Add this function to remove AA artifacts
+function removeAntiAliasing(imageData, backgroundColor, threshold = 30) {
+    const data = imageData.data;
+    const width = imageData.width;
+    const height = imageData.height;
+
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const idx = (y * width + x) * 4;
+            const pixel = [data[idx], data[idx + 1], data[idx + 2]];
+            
+            // Check if pixel is similar to background color
+            const distance = colorDistance(pixel, backgroundColor);
+            if (distance < threshold) {
+                data[idx] = backgroundColor[0];
+                data[idx + 1] = backgroundColor[1];
+                data[idx + 2] = backgroundColor[2];
+            }
+        }
+    }
+}
+
+// Add this function to calculate scaled dimensions
+function calculateScaledDimensions(width, height, maxWidth = 800, maxHeight = 600) {
+    let scale = 1;
+    
+    if (width > maxWidth || height > maxHeight) {
+        const widthScale = maxWidth / width;
+        const heightScale = maxHeight / height;
+        scale = Math.min(widthScale, heightScale);
+    }
+    
+    return {
+        width: Math.floor(width * scale),
+        height: Math.floor(height * scale)
+    };
+}
+
+// Modify the processImage function
 function processImage() {
     if (!originalImage) return;
     
     const blockSize = parseInt(document.getElementById('blockSize').value) || 8;
     const colorCount = parseInt(document.getElementById('colorCount').value) || 16;
     
-    // Set canvas size based on original image
-    canvas.width = originalImage.width;
-    canvas.height = originalImage.height;
+    // Calculate scaled dimensions
+    const { width, height } = calculateScaledDimensions(originalImage.width, originalImage.height);
     
-    // Draw original image
-    ctx.drawImage(originalImage, 0, 0);
+    // Set canvas size to scaled dimensions
+    canvas.width = width;
+    canvas.height = height;
+    
+    // Draw original image with scaling
+    ctx.imageSmoothingEnabled = false; // Disable smoothing for pixel art
+    ctx.drawImage(originalImage, 0, 0, width, height);
     
     // Get image data
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
+    
+    // Detect background color
+    const backgroundColor = detectBackgroundColor(imageData);
     
     // Create pixel blocks
     for (let y = 0; y < canvas.height; y += blockSize) {
@@ -250,6 +320,9 @@ function processImage() {
     
     // Apply median cut color quantization
     medianCutQuantization(imageData, colorCount);
+    
+    // Remove anti-aliasing artifacts
+    removeAntiAliasing(imageData, backgroundColor);
     
     // Put processed image back
     ctx.putImageData(imageData, 0, 0);
