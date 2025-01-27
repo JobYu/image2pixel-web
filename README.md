@@ -1,6 +1,10 @@
 # Pixel Art Converter
 
-![Image2pixel](web/Image2pixel.png)
+| Original | Result |
+|----------|--------|
+| ![Original 1](web/o1.PNG) | ![Result 1](web/r1.PNG) |
+| ![Original 2](web/o2.PNG) | ![Result 2](web/r2.PNG) |
+| ![Original 3](web/o3.JPG) | ![Result 3](web/r3.PNG) |
 
 A simple web-based tool that converts images into pixel art style. 
 
