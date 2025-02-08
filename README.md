@@ -4,9 +4,9 @@ A web-based tool that converts regular images into pixel art with customizable s
 
 | Original | Result |
 |----------|--------|
-| ![Original 1](web/o1.png) | ![Result 1](web/r1.png) |
-| ![Original 2](web/o2.png) | ![Result 2](web/r2.png) |
-| ![Original 3](web/o3.png) | ![Result 3](web/r3.png) |
+| ![Original 1](web/o1.PNG) | ![Result 1](web/r1.PNG) |
+| ![Original 2](web/o2.PNG) | ![Result 2](web/r2.PNG) |
+| ![Original 3](web/o3.png) | ![Result 3](web/r3.PNG) |
 
 ## Version 1.0.1 Updates
 
