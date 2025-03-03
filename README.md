@@ -52,6 +52,14 @@ A web-based tool that converts regular images into pixel art with customizable s
    - Anti-aliasing removal
 4. Download the result using the save button
 
+## Desktop Version on Steam
+
+A desktop version of this pixel art generator is now available on Steam! Built on the same algorithm, the desktop application offers additional features and convenience.
+
+**[Image2pixel-PixelArtGenerator on Steam](https://store.steampowered.com/app/3475120)**
+
+If you enjoy this web tool, please consider adding the desktop version to your Steam wishlist. Thank you for your support! 🙏
+
 ## Technical Requirements
 
 - Modern web browser with HTML5 Canvas support
