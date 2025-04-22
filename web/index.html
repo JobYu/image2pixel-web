@@ -20,7 +20,7 @@
         <div class="controls-row">
             <label for="imageInput" class="button">Open</label>
             <input type="file" id="imageInput" accept="image/*" style="display: none;">
-            <button onclick="saveImage()" class="button">Save</button>
+            <button id="saveButton" onclick="saveImage()" class="button">Save</button>
             
             <div class="control-item">
                 <label for="blockSize">Block Size:</label>
@@ -36,6 +36,11 @@
                     <input type="range" id="colorCount" min="2" max="64" value="32">
                     <input type="number" id="colorCountInput" class="number-input" min="2" max="64" value="32">
                 </div>
+            </div>
+            
+            <div class="control-item">
+                <label for="showGrid">Show Grid:</label>
+                <input type="checkbox" id="showGrid">
             </div>
         </div>
         <div class="preview">
