@@ -8,20 +8,27 @@ A web-based tool that converts regular images into pixel art with customizable s
 | ![Original 2](web/o2.PNG) | ![Result 2](web/r2.PNG) |
 | ![Original 3](web/o3.png) | ![Result 3](web/r3.PNG) |
 
-## Version 1.0.1 Updates
+## Version
 
-### New Features & Optimizations
+Current version: v1.0.2
 
-1. **Anti-Aliasing Removal**
-   - Added background color detection
-   - Automatically removes anti-aliasing artifacts between object and background
-   - Configurable threshold for AA removal sensitivity
+- Added grid display feature
+- Improved download button interaction
 
-2. **Large Image Handling**
-   - Automatic image scaling for large inputs
-   - Maintains aspect ratio
-   - Default maximum dimensions: 800x600px
-   - Disabled image smoothing for better pixel art quality
+v1.0.1
+
+- Added CSS media query to hide the original image container on mobile screens (width <= 768px)
+- Adjusted the result container to take full width and provide better height utilization
+- Improved mobile viewing experience by focusing on the converted result
+
+v1.0.0
+
+- Easy-to-use interface
+- Real-time preview
+- Adjustable pixel block size (2-10 pixels)
+- Customizable color palette (2-64 colors)
+- Download results as PNG
+- No installation required - works in browser
 
 ### Technical Details
 
@@ -94,24 +101,6 @@ Simply clone the repository and open `web/index.html` in your browser. No build 
 ```bash
 git clone htts：//github.com/JobYu/pixel-art-converter.git
 ```
-
-## Version
-
-Current version: v1.0.1
-
-- Added CSS media query to hide the original image container on mobile screens (width <= 768px)
-- Adjusted the result container to take full width and provide better height utilization
-- Improved mobile viewing experience by focusing on the converted result
-
-v1.0.0
-
-- Easy-to-use interface
-- Real-time preview
-- Adjustable pixel block size (2-10 pixels)
-- Customizable color palette (2-64 colors)
-- Download results as PNG
-- No installation required - works in browser
-
 
 ## License
 
