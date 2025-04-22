@@ -1,11 +1,23 @@
 let originalImage = null;
-let canvas = document.getElementById('resultCanvas');
-let ctx = canvas.getContext('2d');
+let processedImage = null;
+
+const canvas = document.getElementById('resultCanvas');
+const ctx = canvas.getContext('2d');
+const saveButton = document.getElementById('saveButton');
+
+// Update save button state
+function updateSaveButtonState() {
+    saveButton.disabled = processedImage === null;
+}
+
+updateSaveButtonState();
 
 // Handle file input
 document.getElementById('imageInput').addEventListener('change', async function(e) {
     // Clear memory
     originalImage = null;
+    processedImage = null;
+    updateSaveButtonState();
     
     // Clear canvas contents
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -69,6 +81,10 @@ function processStaticImage(file) {
         slider.value = value;
         if (originalImage) processImage();
     });
+});
+
+document.getElementById('showGrid').addEventListener('change', function() {
+    if (originalImage) processImage();
 });
 
 // Add ColorBox class for median cut quantization
@@ -325,14 +341,44 @@ function processImage() {
     removeAntiAliasing(imageData, backgroundColor);
     
     // Put processed image back
+    processedImage = imageData;
+
     ctx.putImageData(imageData, 0, 0);
+
+    const showGrid = document.getElementById('showGrid').checked;
+    if (showGrid) {
+        drawGrid(canvas);
+    }
+
+    // After processing is complete
+    updateSaveButtonState();
+}
+
+const drawGrid = (canvas) => {
+    const blockSize = parseInt(document.getElementById('blockSize').value) || 8;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)'; // Semi-transparent black border
+    ctx.lineWidth = 1;
+    // Draw borders for each block
+    for (let y = 0; y < canvas.height; y += blockSize) {
+        for (let x = 0; x < canvas.width; x += blockSize) {
+            ctx.strokeRect(x, y, blockSize, blockSize);
+        }
+    }
 }
 
 function saveImage() {
     if (!canvas) return;
     
     const link = document.createElement('a');
-    link.download = 'pixel-art.png';
-    link.href = canvas.toDataURL('image/png');
+    link.download = `pixel-art.png`;
+    
+    // Use the processed image data instead of the canvas
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.putImageData(processedImage, 0, 0);
+
+    link.href = tempCanvas.toDataURL('image/png');
     link.click();
 } 
