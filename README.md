@@ -10,7 +10,11 @@ A web-based tool that converts regular images into pixel art with customizable s
 
 ## Version
 
-Current version: v1.0.2
+Current version: v1.0.3
+
+- Added support for images with transparency (alpha channel)
+
+v1.0.2
 
 - Added grid display feature
 - Improved download button interaction

@@ -96,42 +96,50 @@ class ColorBox {
     }
 
     computeMinMax() {
-        let minR = 255, minG = 255, minB = 255;
-        let maxR = 0, maxG = 0, maxB = 0;
+        let minR = 255, minG = 255, minB = 255, minA = 255;
+        let maxR = 0, maxG = 0, maxB = 0, maxA = 0;
 
         for (const pixel of this.pixels) {
             minR = Math.min(minR, pixel[0]);
             minG = Math.min(minG, pixel[1]);
             minB = Math.min(minB, pixel[2]);
+            minA = Math.min(minA, pixel[3]);
             maxR = Math.max(maxR, pixel[0]);
             maxG = Math.max(maxG, pixel[1]);
             maxB = Math.max(maxB, pixel[2]);
+            maxA = Math.max(maxA, pixel[3]);
         }
 
-        this.minR = minR; this.minG = minG; this.minB = minB;
-        this.maxR = maxR; this.maxG = maxG; this.maxB = maxB;
+        this.minR = minR; this.minG = minG; this.minB = minB; this.minA = minA;
+        this.maxR = maxR; this.maxG = maxG; this.maxB = maxB; this.maxA = maxA;
         
         const rangeR = maxR - minR;
         const rangeG = maxG - minG;
         const rangeB = maxB - minB;
+        const rangeA = maxA - minA;
         
-        this.largestRange = Math.max(rangeR, rangeG, rangeB);
-        this.splitChannel = rangeR === this.largestRange ? 0 : 
-                          rangeG === this.largestRange ? 1 : 2;
+        this.largestRange = Math.max(rangeR, rangeG, rangeB, rangeA);
+        
+        if (rangeR === this.largestRange) this.splitChannel = 0;
+        else if (rangeG === this.largestRange) this.splitChannel = 1;
+        else if (rangeB === this.largestRange) this.splitChannel = 2;
+        else this.splitChannel = 3;
     }
 
     getAverageColor() {
-        let r = 0, g = 0, b = 0;
+        let r = 0, g = 0, b = 0, a = 0;
         for (const pixel of this.pixels) {
             r += pixel[0];
             g += pixel[1];
             b += pixel[2];
+            a += pixel[3];
         }
         const count = this.pixels.length;
         return [
             Math.round(r / count),
             Math.round(g / count),
-            Math.round(b / count)
+            Math.round(b / count),
+            Math.round(a / count)
         ];
     }
 
@@ -156,7 +164,8 @@ function medianCutQuantization(imageData, colorCount) {
         pixels.push([
             imageData.data[i],
             imageData.data[i + 1],
-            imageData.data[i + 2]
+            imageData.data[i + 2],
+            imageData.data[i + 3]
         ]);
     }
 
@@ -184,7 +193,8 @@ function medianCutQuantization(imageData, colorCount) {
         const pixel = [
             imageData.data[i],
             imageData.data[i + 1],
-            imageData.data[i + 2]
+            imageData.data[i + 2],
+            imageData.data[i + 3]
         ];
         
         let minDistance = Infinity;
@@ -201,6 +211,7 @@ function medianCutQuantization(imageData, colorCount) {
         imageData.data[i] = closestColor[0];
         imageData.data[i + 1] = closestColor[1];
         imageData.data[i + 2] = closestColor[2];
+        imageData.data[i + 3] = closestColor[3];
     }
 }
 
@@ -208,7 +219,8 @@ function colorDistance(color1, color2) {
     return Math.sqrt(
         Math.pow(color1[0] - color2[0], 2) +
         Math.pow(color1[1] - color2[1], 2) +
-        Math.pow(color1[2] - color2[2], 2)
+        Math.pow(color1[2] - color2[2], 2) +
+        Math.pow(color1[3] - color2[3], 2)
     );
 }
 
@@ -222,23 +234,29 @@ function detectBackgroundColor(imageData) {
         [imageData.width - 1, imageData.height - 1]
     ];
     
-    let r = 0, g = 0, b = 0;
+    let r = 0, g = 0, b = 0, a = 0;
     corners.forEach(([x, y]) => {
         const idx = (y * imageData.width + x) * 4;
         r += data[idx];
         g += data[idx + 1];
         b += data[idx + 2];
+        a += data[idx + 3];
     });
     
     return [
         Math.round(r / 4),
         Math.round(g / 4),
-        Math.round(b / 4)
+        Math.round(b / 4),
+        Math.round(a / 4)
     ];
 }
 
 // Add this function to remove AA artifacts
 function removeAntiAliasing(imageData, backgroundColor, threshold = 30) {
+    if (backgroundColor[3] < 128) {
+        return; 
+    }
+
     const data = imageData.data;
     const width = imageData.width;
     const height = imageData.height;
@@ -246,14 +264,14 @@ function removeAntiAliasing(imageData, backgroundColor, threshold = 30) {
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
             const idx = (y * width + x) * 4;
-            const pixel = [data[idx], data[idx + 1], data[idx + 2]];
+            const pixel = [data[idx], data[idx + 1], data[idx + 2], data[idx + 3]];
             
-            // Check if pixel is similar to background color
             const distance = colorDistance(pixel, backgroundColor);
             if (distance < threshold) {
                 data[idx] = backgroundColor[0];
                 data[idx + 1] = backgroundColor[1];
                 data[idx + 2] = backgroundColor[2];
+                data[idx + 3] = backgroundColor[3];
             }
         }
     }
@@ -303,7 +321,7 @@ function processImage() {
     // Create pixel blocks
     for (let y = 0; y < canvas.height; y += blockSize) {
         for (let x = 0; x < canvas.width; x += blockSize) {
-            let r = 0, g = 0, b = 0, count = 0;
+            let r = 0, g = 0, b = 0, a = 0, count = 0;
             
             // Calculate average color for block
             for (let by = 0; by < blockSize && y + by < canvas.height; by++) {
@@ -312,6 +330,7 @@ function processImage() {
                     r += data[idx];
                     g += data[idx + 1];
                     b += data[idx + 2];
+                    a += data[idx + 3];
                     count++;
                 }
             }
@@ -320,6 +339,7 @@ function processImage() {
             r = Math.round(r / count);
             g = Math.round(g / count);
             b = Math.round(b / count);
+            a = Math.round(a / count);
             
             // Fill the block with average color
             for (let by = 0; by < blockSize && y + by < canvas.height; by++) {
@@ -328,17 +348,17 @@ function processImage() {
                     data[idx] = r;
                     data[idx + 1] = g;
                     data[idx + 2] = b;
-                    data[idx + 3] = 255;
+                    data[idx + 3] = a;
                 }
             }
         }
     }
     
+    // Apply AA removal *before* quantization
+    removeAntiAliasing(imageData, backgroundColor);
+
     // Apply median cut color quantization
     medianCutQuantization(imageData, colorCount);
-    
-    // Remove anti-aliasing artifacts
-    removeAntiAliasing(imageData, backgroundColor);
     
     // Put processed image back
     processedImage = imageData;
@@ -367,15 +387,15 @@ const drawGrid = (canvas) => {
 }
 
 function saveImage() {
-    if (!canvas) return;
+    if (!canvas || !processedImage) return;
     
     const link = document.createElement('a');
     link.download = `pixel-art.png`;
     
     // Use the processed image data instead of the canvas
     const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height;
+    tempCanvas.width = processedImage.width;
+    tempCanvas.height = processedImage.height;
     const tempCtx = tempCanvas.getContext('2d');
     tempCtx.putImageData(processedImage, 0, 0);
 
