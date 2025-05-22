@@ -1,3 +1,16 @@
+/**
+ * image2pixel - Pixel Art Generator
+ * Copyright (c) 2024 32comic.com. All Rights Reserved.
+ * 
+ * This file is part of the image2pixel project and is protected under
+ * a Custom Restricted License. Unauthorized commercial use or creation
+ * of derivative competing works is prohibited.
+ * 
+ * This code converts regular images into pixel art with customizable
+ * settings for block size and color count. Includes transparency support
+ * and anti-aliasing removal functionality.
+ */
+
 let originalImage = null;
 let processedImage = null;
 

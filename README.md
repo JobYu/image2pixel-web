@@ -1,4 +1,4 @@
-# Pixel Art Generator
+# image2pixel
 
 A web-based tool that converts regular images into pixel art with customizable settings.
 
@@ -103,7 +103,7 @@ web/
 Simply clone the repository and open `web/index.html` in your browser. No build process or dependencies required.
 
 ```bash
-git clone htts：//github.com/JobYu/pixel-art-converter.git
+git clone htts：//github.com/JobYu/image2pixel-web.git
 ```
 
 ## License
