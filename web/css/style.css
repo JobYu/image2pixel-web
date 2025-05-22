@@ -340,3 +340,36 @@ h3 {
     font-weight: bold;
     font-size: 12px;
 }
+
+.legal-links {
+    margin-top: 10px;
+    font-size: 0.85em;
+}
+
+.legal-links a {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.3s;
+    margin: 0 5px;
+}
+
+.legal-links a:hover {
+    color: #4CAF50;
+    text-decoration: underline;
+}
+
+.language-options {
+    margin-top: 5px;
+    font-size: 0.85em;
+    color: #888;
+}
+
+.language-options a {
+    color: #888;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.language-options a:hover {
+    color: #4CAF50;
+}
