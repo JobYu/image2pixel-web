@@ -18,6 +18,10 @@ const canvas = document.getElementById('resultCanvas');
 const ctx = canvas.getContext('2d');
 const saveButton = document.getElementById('saveButton');
 
+// Initialize canvas with default size to match the container
+canvas.width = 300;
+canvas.height = 300;
+
 // Update save button state
 function updateSaveButtonState() {
     saveButton.disabled = processedImage === null;

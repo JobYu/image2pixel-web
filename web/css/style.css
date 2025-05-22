@@ -145,12 +145,16 @@ input[type="range"] {
     }
 }
 
-.image-container {
+.image-container, 
+canvas#resultCanvas {
     width: 100%;
-    min-height: 200px;
+    min-height: 300px;
     background-color: var(--panel-bg);
     border: 1px solid var(--border-color);
     border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 img#originalImage {
