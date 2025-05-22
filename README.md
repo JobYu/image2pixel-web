@@ -108,7 +108,7 @@ git clone htts：//github.com/JobYu/image2pixel-web.git
 
 ## License
 
-Copyright © 2024 [32comic.com](https://32comic.com). All rights reserved.
+Copyright © 2024 [image2pixel.app](https://image2pixel.app). All rights reserved.
 
 ## Acknowledgments
 

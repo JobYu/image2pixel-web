@@ -1,6 +1,6 @@
 /**
  * image2pixel - Pixel Art Generator
- * Copyright (c) 2024 32comic.com. All Rights Reserved.
+ * Copyright (c) 2024 image2pixel.app. All Rights Reserved.
  * 
  * This file is part of the image2pixel project and is protected under
  * a Custom Restricted License. Unauthorized commercial use or creation
