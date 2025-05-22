@@ -111,7 +111,7 @@ input[type="range"] {
     border: 1px solid var(--border-color);
     border-radius: 4px;
     padding: 10px;
-    min-height: 300px;
+    height: 400px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -123,7 +123,7 @@ input[type="range"] {
     }
     .result {
         max-width: 100%;
-        min-height: auto;
+        height: auto;
         max-height: 65vh;
         flex: 1 1 100%;
     }
@@ -148,18 +148,19 @@ input[type="range"] {
 .image-container, 
 canvas#resultCanvas {
     width: 100%;
-    min-height: 300px;
+    height: 340px;
     background-color: var(--panel-bg);
     border: 1px solid var(--border-color);
     border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex: 1;
 }
 
 img#originalImage {
     max-width: 100%;
-    height: auto;
+    max-height: 100%;
     object-fit: contain;
 }
 
