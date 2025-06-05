@@ -17,24 +17,27 @@ let processedImage = null;
 const canvas = document.getElementById('resultCanvas');
 const ctx = canvas.getContext('2d');
 const saveButton = document.getElementById('saveButton');
+const printButton = document.getElementById('printButton');
 
 // Initialize canvas with default size to match the container
 canvas.width = 300;
 canvas.height = 300;
 
-// Update save button state
-function updateSaveButtonState() {
-    saveButton.disabled = processedImage === null;
+// Update button states
+function updateButtonStates() {
+    const hasImage = processedImage !== null;
+    saveButton.disabled = !hasImage;
+    printButton.disabled = !hasImage;
 }
 
-updateSaveButtonState();
+updateButtonStates();
 
 // Handle file input
 document.getElementById('imageInput').addEventListener('change', async function(e) {
     // Clear memory
     originalImage = null;
     processedImage = null;
-    updateSaveButtonState();
+    updateButtonStates();
     
     // Clear canvas contents
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -388,7 +391,7 @@ function processImage() {
     }
 
     // After processing is complete
-    updateSaveButtonState();
+    updateButtonStates();
 }
 
 const drawGrid = (canvas) => {
@@ -418,4 +421,106 @@ function saveImage() {
 
     link.href = tempCanvas.toDataURL('image/png');
     link.click();
+}
+
+function printImage() {
+    if (!canvas || !processedImage) return;
+    
+    // Create a temporary canvas for printing
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = processedImage.width;
+    tempCanvas.height = processedImage.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.putImageData(processedImage, 0, 0);
+    
+    // Check if grid is enabled and draw it on the print canvas
+    const showGrid = document.getElementById('showGrid').checked;
+    if (showGrid) {
+        const blockSize = parseInt(document.getElementById('blockSize').value) || 8;
+        tempCtx.strokeStyle = 'rgba(0, 0, 0, 0.3)'; // Slightly darker for printing
+        tempCtx.lineWidth = 1;
+        
+        // Draw grid lines
+        for (let y = 0; y < tempCanvas.height; y += blockSize) {
+            for (let x = 0; x < tempCanvas.width; x += blockSize) {
+                tempCtx.strokeRect(x, y, blockSize, blockSize);
+            }
+        }
+    }
+    
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Print Pixel Art</title>
+            <style>
+                @page {
+                    size: A4;
+                    margin: 0.5cm;
+                }
+                body {
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                    background: #f0f0f0;
+                }
+                img {
+                    max-width: 100%;
+                    max-height: 100%;
+                    border: 1px solid #ccc;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    image-rendering: pixelated;
+                    image-rendering: -moz-crisp-edges;
+                    image-rendering: crisp-edges;
+                    object-fit: contain;
+                }
+                @media print {
+                    @page {
+                        size: A4;
+                        margin: 0.5cm;
+                    }
+                    body {
+                        background: white;
+                        margin: 0;
+                        padding: 0;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                    }
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        max-width: 100%;
+                        max-height: 100%;
+                        border: none;
+                        box-shadow: none;
+                        object-fit: contain;
+                        image-rendering: pixelated;
+                        image-rendering: -moz-crisp-edges;
+                        image-rendering: crisp-edges;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <img src="${tempCanvas.toDataURL('image/png')}" alt="Pixel Art">
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close();
+    
+    // Wait for the image to load, then print
+    printWindow.onload = function() {
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 100);
+    };
 } 

@@ -10,7 +10,14 @@ A web-based tool that converts regular images into pixel art with customizable s
 
 ## Version
 
-Current version: v1.0.3
+Current version: v1.0.4
+
+
+v1.0.4
+
+- Added support for Print
+
+v1.0.3
 
 - Added support for images with transparency (alpha channel)
 
@@ -61,7 +68,9 @@ v1.0.0
    - Pixel blocking
    - Color quantization
    - Anti-aliasing removal
-4. Download the result using the save button
+4. Download or print the result using the Save or Print buttons
+   - Print function automatically fills A4 page
+   - Grid display is preserved when printing (if enabled)
 
 ## Desktop Version on Steam
 
@@ -84,6 +93,7 @@ If you enjoy this web tool, please consider adding the desktop version to your S
 - Adjustable pixel block size (2-10 pixels)
 - Customizable color palette (2-64 colors)
 - Download results as PNG
+- Print results directly from browser
 - No installation required - works in browser
 - Improved mobile viewing experience
 
