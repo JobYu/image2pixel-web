@@ -523,4 +523,39 @@ function printImage() {
             printWindow.close();
         }, 100);
     };
-} 
+}
+
+// WeChat QR code mobile support
+function initWeChatQR() {
+    const wechatContainer = document.querySelector('.wechat-container');
+    const wechatTooltip = document.querySelector('.wechat-tooltip');
+    
+    if (!wechatContainer || !wechatTooltip) return;
+    
+    // 检测是否为触摸设备
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    if (isTouchDevice) {
+        // 手机端点击切换显示
+        wechatContainer.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            wechatTooltip.classList.toggle('show');
+        });
+        
+        // 点击外部区域关闭
+        document.addEventListener('click', function(e) {
+            if (!wechatContainer.contains(e.target)) {
+                wechatTooltip.classList.remove('show');
+            }
+        });
+        
+        // 防止二维码区域点击事件冒泡
+        wechatTooltip.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+}
+
+// 页面加载完成后初始化微信二维码功能
+document.addEventListener('DOMContentLoaded', initWeChatQR);

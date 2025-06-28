@@ -395,6 +395,7 @@ h3 {
     position: relative;
     display: inline-flex;
     align-items: center;
+    cursor: pointer;
 }
 
 .wechat-tooltip {
@@ -414,9 +415,20 @@ h3 {
     min-width: 200px;
 }
 
-.wechat-container:hover .wechat-tooltip {
-    opacity: 1;
-    visibility: visible;
+/* PC端保持hover效果 */
+@media (hover: hover) and (pointer: fine) {
+    .wechat-container:hover .wechat-tooltip {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+/* 手机端和触摸设备使用点击切换 */
+@media (hover: none) or (pointer: coarse) {
+    .wechat-tooltip.show {
+        opacity: 1;
+        visibility: visible;
+    }
 }
 
 .wechat-container img {
