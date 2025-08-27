@@ -37,10 +37,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const textWidth = Math.ceil(metrics.width);
         const textHeight = fontSize;
         
-        // Add generous padding for large font
-        const padding = Math.max(60, fontSize * 0.5); // At least 60px or 50% of font size
-        const canvasWidth = Math.max(textWidth + padding * 2, 300);
-        const canvasHeight = Math.max(textHeight + padding * 2, 300);
+        // Add extra generous padding for large font to prevent truncation
+        const padding = Math.max(120, fontSize * 0.8); // At least 120px or 80% of font size
+        const canvasWidth = Math.max(textWidth + padding * 2, textWidth * 1.5, 400); // Ensure minimum space
+        const canvasHeight = Math.max(textHeight + padding * 2, 400);
         
         // Set canvas dimensions
         canvas.width = canvasWidth;
