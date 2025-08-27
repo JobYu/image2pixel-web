@@ -1,0 +1,24 @@
+@font-face {
+    font-family: 'PixelFont';
+    src: url('../Pixel32ChinesePixelFont-Book.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.home-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.text-input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 300px;
+}
+
+#resultCanvas {
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+}
