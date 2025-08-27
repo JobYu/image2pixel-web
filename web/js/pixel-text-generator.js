@@ -51,36 +51,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         const PREVIEW_WIDTH = dimensions.width;
         const PREVIEW_HEIGHT = dimensions.height;
         
-        // Calculate optimal scale factor based on text length and preview area
-        let scaleFactor = 15; // Start with 1500% (15x)
+        // Use fixed scale factor for better readability
+        let scaleFactor = 15; // Keep 1500% (15x) for clarity
         let fontSize = baseFontSize * scaleFactor;
         
-        // Test font and measure text width
+        // Set font for measurements
         ctx.font = `${fontSize}px ${fontName}`;
-        let metrics = ctx.measureText(text);
-        let textWidth = Math.ceil(metrics.width);
         
-        // Reduce scale factor if text is too wide for preview area
-        const maxTextWidth = PREVIEW_WIDTH * 0.8; // Use 80% of preview width
-        while (textWidth > maxTextWidth && scaleFactor > 3) { // Minimum 3x scale
-            scaleFactor--;
-            fontSize = baseFontSize * scaleFactor;
-            ctx.font = `${fontSize}px ${fontName}`;
-            metrics = ctx.measureText(text);
-            textWidth = Math.ceil(metrics.width);
-        }
+        // Calculate line wrapping
+        const maxLineWidth = PREVIEW_WIDTH * 0.9; // Use 90% of preview width
+        const lines = wrapText(text, maxLineWidth, ctx);
+        
+        // Calculate required height for multiple lines
+        const lineHeight = fontSize * 1.2; // 120% line height
+        const totalTextHeight = lines.length * lineHeight;
+        
+        // Adjust canvas height based on text lines, but respect minimum height
+        const minHeight = Math.min(PREVIEW_HEIGHT, 200);
+        const requiredHeight = Math.max(totalTextHeight + 60, minHeight); // Add padding
+        const canvasHeight = Math.min(requiredHeight, PREVIEW_HEIGHT * 1.5); // Max 1.5x original height
         
         // Set dynamic canvas dimensions
         canvas.width = PREVIEW_WIDTH;
-        canvas.height = PREVIEW_HEIGHT;
+        canvas.height = canvasHeight;
         
         // Set CSS dimensions to exact pixel values to prevent any browser scaling
         canvas.style.width = PREVIEW_WIDTH + 'px';
-        canvas.style.height = PREVIEW_HEIGHT + 'px';
+        canvas.style.height = canvasHeight + 'px';
         canvas.style.minWidth = PREVIEW_WIDTH + 'px';
-        canvas.style.minHeight = PREVIEW_HEIGHT + 'px';
+        canvas.style.minHeight = canvasHeight + 'px';
         canvas.style.maxWidth = PREVIEW_WIDTH + 'px';
-        canvas.style.maxHeight = PREVIEW_HEIGHT + 'px';
+        canvas.style.maxHeight = canvasHeight + 'px';
         canvas.style.imageRendering = 'pixelated';
         canvas.style.imageRendering = 'crisp-edges';
         canvas.style.flex = 'none';
@@ -115,16 +116,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             ctx.fontKerning = 'none';
         }
         
-        // Draw text centered and aligned to pixel grid
+        // Draw multiple lines of text centered and aligned to pixel grid
         const pixelSize = scaleFactor; // Current scale factor per original pixel
-        const centerX = Math.floor(canvas.width / 2);
-        const centerY = Math.floor(canvas.height / 2);
+        const startY = Math.floor((canvas.height - totalTextHeight) / 2) + lineHeight / 2;
         
-        // Align to nearest pixel grid position
-        const x = Math.round(centerX / pixelSize) * pixelSize;
-        const y = Math.round(centerY / pixelSize) * pixelSize;
-        
-        ctx.fillText(text, x, y);
+        // Draw each line
+        lines.forEach((line, index) => {
+            const centerX = Math.floor(canvas.width / 2);
+            const lineY = startY + (index * lineHeight);
+            
+            // Align to nearest pixel grid position
+            const x = Math.round(centerX / pixelSize) * pixelSize;
+            const y = Math.round(lineY / pixelSize) * pixelSize;
+            
+            ctx.fillText(line, x, y);
+        });
 
         // Draw grid if enabled
         if (showGridCheckbox.checked) {
@@ -160,6 +166,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         ctx.globalAlpha = 1.0; // Reset alpha
     }
 
+    function wrapText(text, maxWidth, context) {
+        if (!text) return [''];
+        
+        const words = text.split('');
+        const lines = [];
+        let currentLine = '';
+        
+        for (let i = 0; i < words.length; i++) {
+            const char = words[i];
+            const testLine = currentLine + char;
+            const metrics = context.measureText(testLine);
+            const testWidth = metrics.width;
+            
+            if (testWidth > maxWidth && currentLine.length > 0) {
+                // Current line is full, start a new line
+                lines.push(currentLine);
+                currentLine = char;
+            } else {
+                // Add character to current line
+                currentLine = testLine;
+            }
+        }
+        
+        // Add the last line if it's not empty
+        if (currentLine.length > 0) {
+            lines.push(currentLine);
+        }
+        
+        return lines.length > 0 ? lines : [''];
+    }
+
     function generateHighResCanvas(targetScale) {
         // Generate a high-resolution version of the text for saving/printing
         const text = textInput.value || 'Hello World';
@@ -169,16 +206,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tempCanvas = document.createElement('canvas');
         const tempCtx = tempCanvas.getContext('2d');
         
-        // Measure text at target scale
+        // Set font and calculate wrapping for high-res version
         tempCtx.font = `${fontSize}px ${fontName}`;
-        const metrics = tempCtx.measureText(text);
-        const textWidth = Math.ceil(metrics.width);
-        const textHeight = fontSize;
+        const maxWidth = 800 * (targetScale / 15); // Scale the max width proportionally
+        const lines = wrapText(text, maxWidth, tempCtx);
+        
+        // Calculate dimensions for multiple lines
+        const lineHeight = fontSize * 1.2;
+        const totalTextHeight = lines.length * lineHeight;
+        const maxLineWidth = Math.max(...lines.map(line => tempCtx.measureText(line).width));
         
         // Set canvas size with padding
         const padding = fontSize * 0.5;
-        tempCanvas.width = textWidth + padding * 2;
-        tempCanvas.height = textHeight + padding * 2;
+        tempCanvas.width = maxLineWidth + padding * 2;
+        tempCanvas.height = totalTextHeight + padding * 2;
         
         // Set up rendering context
         tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
@@ -197,10 +238,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         tempCtx.msImageSmoothingEnabled = false;
         tempCtx.oImageSmoothingEnabled = false;
         
-        // Draw text centered
-        const x = tempCanvas.width / 2;
-        const y = tempCanvas.height / 2;
-        tempCtx.fillText(text, x, y);
+        // Draw multiple lines centered
+        const startY = padding + lineHeight / 2;
+        const centerX = tempCanvas.width / 2;
+        
+        lines.forEach((line, index) => {
+            const y = startY + (index * lineHeight);
+            tempCtx.fillText(line, centerX, y);
+        });
         
         return tempCanvas;
     }
