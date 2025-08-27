@@ -31,25 +31,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Add padding for centering
         const padding = 20;
-        canvas.width = Math.max(textWidth + padding * 2, 200);
-        canvas.height = Math.max(textHeight + padding * 2, 80);
+        const canvasWidth = Math.max(textWidth + padding * 2, 200);
+        const canvasHeight = Math.max(textHeight + padding * 2, 80);
+        
+        // Set canvas dimensions
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        
+        // Also set CSS dimensions to match exactly (prevent scaling)
+        canvas.style.width = canvasWidth + 'px';
+        canvas.style.height = canvasHeight + 'px';
 
-        // Clear canvas and set background
+        // Clear canvas and set white background
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#f9f9f9';
+        ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Set font properties for drawing
         ctx.font = `${fontSize}px ${fontName}`;
-        ctx.fillStyle = '#000';
+        ctx.fillStyle = '#000000';
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
 
-        // Disable all forms of anti-aliasing
+        // Disable all forms of anti-aliasing and set additional properties
         ctx.imageSmoothingEnabled = false;
         ctx.webkitImageSmoothingEnabled = false;
         ctx.mozImageSmoothingEnabled = false;
         ctx.msImageSmoothingEnabled = false;
+        ctx.oImageSmoothingEnabled = false;
+        
+        // Additional canvas properties to ensure crisp rendering
+        if (ctx.imageSmoothingQuality) {
+            ctx.imageSmoothingQuality = 'low';
+        }
         
         // Draw text centered
         const x = canvas.width / 2;

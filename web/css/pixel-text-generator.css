@@ -20,14 +20,25 @@
 
 canvas#resultCanvas {
     border: 1px solid #ccc;
-    background-color: #f9f9f9;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: -webkit-crisp-edges;
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
+    background-color: #ffffff;
+    image-rendering: -moz-crisp-edges !important;
+    image-rendering: -webkit-crisp-edges !important;
+    image-rendering: pixelated !important;
+    image-rendering: crisp-edges !important;
+    image-rendering: -o-crisp-edges !important;
+    -ms-interpolation-mode: nearest-neighbor !important;
     width: auto !important;
     height: auto !important;
-    max-width: 100%;
-    transform: scale(1);
-    transform-origin: top left;
+    max-width: none !important;
+    max-height: none !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    transform: none !important;
+    zoom: 1 !important;
+    object-fit: none !important;
+    filter: none !important;
+    
+    /* Override any inherited styles that might cause scaling */
+    flex: none !important;
+    box-sizing: content-box !important;
 }
