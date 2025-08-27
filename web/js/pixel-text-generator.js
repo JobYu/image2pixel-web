@@ -5,7 +5,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const saveButton = document.getElementById('saveButton');
     const printButton = document.getElementById('printButton');
 
-    const fontSize = 32;
+    const baseFontSize = 12; // Original 12x12 pixel font size
+    const scaleFactor = 15; // 1500% scale
+    const fontSize = baseFontSize * scaleFactor; // 180px for preview
     const fontName = 'PixelFont';
     let fontLoaded = false;
 
@@ -89,16 +91,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function saveImage() {
-        const scaledCanvas = getScaledCanvas(15);
+        // Canvas is already at 15x scale, so we use it directly for 1500% output
         const link = document.createElement('a');
         link.download = 'pixel-text-art.png';
-        link.href = scaledCanvas.toDataURL('image/png');
+        link.href = canvas.toDataURL('image/png');
         link.click();
     }
 
     function printImage() {
-        const scaledCanvas = getScaledCanvas(15);
-        const dataUrl = scaledCanvas.toDataURL('image/png');
+        // Canvas is already at 15x scale, so we use it directly for 1500% output
+        const dataUrl = canvas.toDataURL('image/png');
         const windowContent = `<!DOCTYPE html>
             <html>
                 <head>
