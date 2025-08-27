@@ -326,12 +326,14 @@ h3 {
     height: auto;
 }
 
-.steam-banner a[href*="apps.apple.com"] {
+.steam-banner a[href*="apps.apple.com"],
+.steam-banner a[href*="play.google.com"] {
     background: none;
     padding: 0;
 }
 
-.steam-banner a[href*="apps.apple.com"]:hover {
+.steam-banner a[href*="apps.apple.com"]:hover,
+.steam-banner a[href*="play.google.com"]:hover {
     transform: translateY(-2px);
     background: none;
 }
