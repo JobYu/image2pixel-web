@@ -62,6 +62,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         ctx.fillStyle = '#000000';
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
+        
+        // Re-measure text after setting font to ensure accuracy
+        const finalMetrics = ctx.measureText(text);
+        const finalTextWidth = Math.ceil(finalMetrics.width);
+        
+        // If the remeasured text is larger than our canvas, expand it
+        if (finalTextWidth + padding * 2 > canvas.width) {
+            const newWidth = finalTextWidth + padding * 2;
+            canvas.width = newWidth;
+            canvas.style.width = newWidth + 'px';
+            
+            // Reapply all settings after canvas resize
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = `${fontSize}px ${fontName}`;
+            ctx.fillStyle = '#000000';
+            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'center';
+        }
 
         // Aggressively disable all forms of anti-aliasing
         ctx.imageSmoothingEnabled = false;
