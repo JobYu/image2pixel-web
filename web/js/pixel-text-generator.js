@@ -107,9 +107,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             ctx.fontKerning = 'none';
         }
         
-        // Draw text centered
-        const x = Math.floor(canvas.width / 2);
-        const y = Math.floor(canvas.height / 2);
+        // Draw text centered and aligned to pixel grid
+        const pixelSize = scaleFactor; // 15px per original pixel
+        const centerX = Math.floor(canvas.width / 2);
+        const centerY = Math.floor(canvas.height / 2);
+        
+        // Align to nearest pixel grid position
+        const x = Math.round(centerX / pixelSize) * pixelSize;
+        const y = Math.round(centerY / pixelSize) * pixelSize;
+        
         ctx.fillText(text, x, y);
 
         // Draw grid if enabled
