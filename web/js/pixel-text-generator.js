@@ -59,8 +59,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Set CSS dimensions to exact pixel values to prevent any browser scaling
         canvas.style.width = PREVIEW_WIDTH + 'px';
         canvas.style.height = PREVIEW_HEIGHT + 'px';
+        canvas.style.minWidth = PREVIEW_WIDTH + 'px';
+        canvas.style.minHeight = PREVIEW_HEIGHT + 'px';
+        canvas.style.maxWidth = PREVIEW_WIDTH + 'px';
+        canvas.style.maxHeight = PREVIEW_HEIGHT + 'px';
         canvas.style.imageRendering = 'pixelated';
         canvas.style.imageRendering = 'crisp-edges';
+        canvas.style.flex = 'none';
+        canvas.style.display = 'block';
 
         // Clear canvas and set white background
         ctx.clearRect(0, 0, canvas.width, canvas.height);

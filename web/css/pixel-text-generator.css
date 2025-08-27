@@ -59,7 +59,10 @@ canvas#resultCanvas {
 
 .result {
     height: auto !important;
-    min-height: 320px !important;
+    min-height: 450px !important;
     max-height: none !important;
-    overflow: auto !important; /* allow scroll instead of squashing */
+    overflow: auto !important;
+    width: auto !important;
+    max-width: none !important;
+    flex: none !important;
 }
