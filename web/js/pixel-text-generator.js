@@ -51,20 +51,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         const PREVIEW_WIDTH = dimensions.width;
         const PREVIEW_HEIGHT = dimensions.height;
         
-        // Use fixed scale factor for better readability
-        let scaleFactor = 15; // Keep 1500% (15x) for clarity
+        // Start with preferred scale factor for best readability
+        let scaleFactor = 15; // Start with 1500% (15x) for clarity
         let fontSize = baseFontSize * scaleFactor;
+        let lines, lineHeight, totalTextHeight;
         
-        // Set font for measurements
-        ctx.font = `${fontSize}px ${fontName}`;
-        
-        // Calculate line wrapping
-        const maxLineWidth = PREVIEW_WIDTH * 0.9; // Use 90% of preview width
-        const lines = wrapText(text, maxLineWidth, ctx);
-        
-        // Calculate required height for multiple lines
-        const lineHeight = fontSize * 1.2; // 120% line height
-        const totalTextHeight = lines.length * lineHeight;
+        // Try to fit text with current scale factor
+        do {
+            fontSize = baseFontSize * scaleFactor;
+            ctx.font = `${fontSize}px ${fontName}`;
+            
+            // Calculate line wrapping
+            const maxLineWidth = PREVIEW_WIDTH * 0.9; // Use 90% of preview width
+            lines = wrapText(text, maxLineWidth, ctx);
+            
+            // Calculate required height for multiple lines
+            lineHeight = fontSize * 1.2; // 120% line height
+            totalTextHeight = lines.length * lineHeight;
+            
+            // Check if text fits in preview height (leave some padding)
+            const maxAllowedHeight = PREVIEW_HEIGHT * 0.9;
+            
+            if (totalTextHeight <= maxAllowedHeight || scaleFactor <= 3) {
+                // Text fits or we've reached minimum scale
+                break;
+            }
+            
+            // Reduce scale factor and try again
+            scaleFactor--;
+            
+        } while (scaleFactor >= 3); // Minimum 3x scale for readability
         
         // Adjust canvas height based on text lines, but respect minimum height
         const minHeight = Math.min(PREVIEW_HEIGHT, 200);
