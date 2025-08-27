@@ -43,9 +43,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const textWidth = Math.ceil(metrics.width);
         const textHeight = fontSize;
         
-        // Add extra generous padding for large font to prevent truncation
-        const padding = Math.max(120, fontSize * 0.8); // At least 120px or 80% of font size
-        const canvasWidth = Math.max(textWidth + padding * 2, textWidth * 1.5, 400); // Ensure minimum space
+        // Calculate generous padding - ensure enough space for all characters
+        const pixelSize = scaleFactor; // 15px per original pixel
+        const minPadding = pixelSize * 20; // At least 20 pixels worth of padding (300px)
+        const adaptivePadding = textWidth * 0.3; // 30% of text width as padding
+        const padding = Math.max(minPadding, adaptivePadding);
+        
+        // Ensure canvas is wide enough with multiple safety factors
+        const safeWidth = Math.max(
+            textWidth + padding * 2,  // Basic calculation
+            textWidth * 1.8,          // 80% extra space
+            600                       // Minimum width
+        );
+        const canvasWidth = Math.ceil(safeWidth / pixelSize) * pixelSize; // Align to pixel grid
         const canvasHeight = Math.max(textHeight + padding * 2, 400);
         
         // Set canvas dimensions
@@ -73,9 +83,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const finalMetrics = ctx.measureText(text);
         const finalTextWidth = Math.ceil(finalMetrics.width);
         
-        // If the remeasured text is larger than our canvas, expand it
-        if (finalTextWidth + padding * 2 > canvas.width) {
-            const newWidth = finalTextWidth + padding * 2;
+        // If the remeasured text is larger than our canvas, expand it with extra safety margin
+        const requiredWidth = finalTextWidth * 2; // Double the text width for safety
+        if (requiredWidth > canvas.width) {
+            const newWidth = Math.ceil(requiredWidth / pixelSize) * pixelSize; // Align to pixel grid
             canvas.width = newWidth;
             canvas.style.width = newWidth + 'px';
             
