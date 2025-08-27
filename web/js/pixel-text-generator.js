@@ -120,22 +120,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function drawGrid() {
-        const gridSize = fontSize; // 180px (12px * 15 scale factor)
+        // Each original pixel becomes 15px x 15px when scaled up (12px font * 15 scale / 12 pixels = 15px per pixel)
+        const pixelSize = scaleFactor; // 15px per original pixel
         
         ctx.strokeStyle = '#cccccc';
         ctx.lineWidth = 1;
-        ctx.globalAlpha = 0.5; // Make grid semi-transparent
+        ctx.globalAlpha = 0.3; // Make grid semi-transparent
         
-        // Draw vertical lines
-        for (let x = 0; x <= canvas.width; x += gridSize) {
+        // Draw vertical lines for each pixel
+        for (let x = 0; x <= canvas.width; x += pixelSize) {
             ctx.beginPath();
             ctx.moveTo(x, 0);
             ctx.lineTo(x, canvas.height);
             ctx.stroke();
         }
         
-        // Draw horizontal lines
-        for (let y = 0; y <= canvas.height; y += gridSize) {
+        // Draw horizontal lines for each pixel
+        for (let y = 0; y <= canvas.height; y += pixelSize) {
             ctx.beginPath();
             ctx.moveTo(0, y);
             ctx.lineTo(canvas.width, y);
