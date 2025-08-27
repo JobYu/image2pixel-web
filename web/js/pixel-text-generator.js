@@ -7,10 +7,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const showGridCheckbox = document.getElementById('showGrid');
 
     const baseFontSize = 12; // Original 12x12 pixel font size
-    const scaleFactor = 15; // 1500% scale
-    const fontSize = baseFontSize * scaleFactor; // 180px for preview
     const MAX_CHARS = 32; // Limit input to <= 32 characters
     const fontName = 'PixelFont';
+    
+    // Fixed preview area dimensions
+    const PREVIEW_WIDTH = 800;
+    const PREVIEW_HEIGHT = 400;
     let fontLoaded = false;
 
     // Explicitly load the pixel font
@@ -31,30 +33,32 @@ document.addEventListener('DOMContentLoaded', async () => {
             textInput.value = text;
         }
         
-        // Ensure we have proper font loaded
-        if (!fontLoaded) {
-            ctx.font = `${fontSize}px Arial`; // Fallback
-        } else {
+        // Calculate optimal scale factor based on text length and preview area
+        let scaleFactor = 15; // Start with 1500% (15x)
+        let fontSize = baseFontSize * scaleFactor;
+        
+        // Test font and measure text width
+        ctx.font = `${fontSize}px ${fontName}`;
+        let metrics = ctx.measureText(text);
+        let textWidth = Math.ceil(metrics.width);
+        
+        // Reduce scale factor if text is too wide for preview area
+        const maxTextWidth = PREVIEW_WIDTH * 0.8; // Use 80% of preview width
+        while (textWidth > maxTextWidth && scaleFactor > 3) { // Minimum 3x scale
+            scaleFactor--;
+            fontSize = baseFontSize * scaleFactor;
             ctx.font = `${fontSize}px ${fontName}`;
+            metrics = ctx.measureText(text);
+            textWidth = Math.ceil(metrics.width);
         }
         
-        // Measure text to set canvas size
-        const metrics = ctx.measureText(text);
-        const textWidth = Math.ceil(metrics.width);
-        const textHeight = fontSize;
-        
-        // Add extra generous padding for large font to prevent truncation
-        const padding = Math.max(120, fontSize * 0.8); // At least 120px or 80% of font size
-        const canvasWidth = Math.max(textWidth + padding * 2, textWidth * 1.5, 400); // Ensure minimum space
-        const canvasHeight = Math.max(textHeight + padding * 2, 400);
-        
-        // Set canvas dimensions
-        canvas.width = canvasWidth;
-        canvas.height = canvasHeight;
+        // Set fixed canvas dimensions
+        canvas.width = PREVIEW_WIDTH;
+        canvas.height = PREVIEW_HEIGHT;
         
         // Set CSS dimensions to exact pixel values to prevent any browser scaling
-        canvas.style.width = canvasWidth + 'px';
-        canvas.style.height = canvasHeight + 'px';
+        canvas.style.width = PREVIEW_WIDTH + 'px';
+        canvas.style.height = PREVIEW_HEIGHT + 'px';
         canvas.style.imageRendering = 'pixelated';
         canvas.style.imageRendering = 'crisp-edges';
 
@@ -63,31 +67,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Set font properties for drawing - reapply after canvas resize
+        // Set font properties for drawing
         ctx.font = `${fontSize}px ${fontName}`;
         ctx.fillStyle = '#000000';
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
-        
-        // Re-measure text after setting font to ensure accuracy
-        const finalMetrics = ctx.measureText(text);
-        const finalTextWidth = Math.ceil(finalMetrics.width);
-        
-        // If the remeasured text is larger than our canvas, expand it
-        if (finalTextWidth + padding * 2 > canvas.width) {
-            const newWidth = finalTextWidth + padding * 2;
-            canvas.width = newWidth;
-            canvas.style.width = newWidth + 'px';
-            
-            // Reapply all settings after canvas resize
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.font = `${fontSize}px ${fontName}`;
-            ctx.fillStyle = '#000000';
-            ctx.textBaseline = 'middle';
-            ctx.textAlign = 'center';
-        }
 
         // Aggressively disable all forms of anti-aliasing
         ctx.imageSmoothingEnabled = false;
@@ -108,7 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         // Draw text centered and aligned to pixel grid
-        const pixelSize = scaleFactor; // 15px per original pixel
+        const pixelSize = scaleFactor; // Current scale factor per original pixel
         const centerX = Math.floor(canvas.width / 2);
         const centerY = Math.floor(canvas.height / 2);
         
@@ -120,14 +104,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Draw grid if enabled
         if (showGridCheckbox.checked) {
-            drawGrid();
+            drawGrid(scaleFactor);
         }
 
     }
 
-    function drawGrid() {
-        // Each original pixel becomes 15px x 15px when scaled up (12px font * 15 scale / 12 pixels = 15px per pixel)
-        const pixelSize = scaleFactor; // 15px per original pixel
+    function drawGrid(currentScaleFactor) {
+        // Each original pixel becomes scaleFactor px when scaled up
+        const pixelSize = currentScaleFactor;
         
         ctx.strokeStyle = '#cccccc';
         ctx.lineWidth = 1;
@@ -152,6 +136,51 @@ document.addEventListener('DOMContentLoaded', async () => {
         ctx.globalAlpha = 1.0; // Reset alpha
     }
 
+    function generateHighResCanvas(targetScale) {
+        // Generate a high-resolution version of the text for saving/printing
+        const text = textInput.value || 'Hello World';
+        const fontSize = baseFontSize * targetScale;
+        
+        // Create new canvas for high-res version
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Measure text at target scale
+        tempCtx.font = `${fontSize}px ${fontName}`;
+        const metrics = tempCtx.measureText(text);
+        const textWidth = Math.ceil(metrics.width);
+        const textHeight = fontSize;
+        
+        // Set canvas size with padding
+        const padding = fontSize * 0.5;
+        tempCanvas.width = textWidth + padding * 2;
+        tempCanvas.height = textHeight + padding * 2;
+        
+        // Set up rendering context
+        tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+        tempCtx.fillStyle = '#ffffff';
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+        
+        tempCtx.font = `${fontSize}px ${fontName}`;
+        tempCtx.fillStyle = '#000000';
+        tempCtx.textBaseline = 'middle';
+        tempCtx.textAlign = 'center';
+        
+        // Disable anti-aliasing
+        tempCtx.imageSmoothingEnabled = false;
+        tempCtx.webkitImageSmoothingEnabled = false;
+        tempCtx.mozImageSmoothingEnabled = false;
+        tempCtx.msImageSmoothingEnabled = false;
+        tempCtx.oImageSmoothingEnabled = false;
+        
+        // Draw text centered
+        const x = tempCanvas.width / 2;
+        const y = tempCanvas.height / 2;
+        tempCtx.fillText(text, x, y);
+        
+        return tempCanvas;
+    }
+
     function getScaledCanvas(scaleFactor) {
         const scaledCanvas = document.createElement('canvas');
         scaledCanvas.width = canvas.width * scaleFactor;
@@ -169,16 +198,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function saveImage() {
-        // Canvas is already at 15x scale, so we use it directly for 1500% output
+        // Create a high-quality version at 15x scale for saving
+        const highResCanvas = generateHighResCanvas(15);
         const link = document.createElement('a');
         link.download = 'pixel-text-art.png';
-        link.href = canvas.toDataURL('image/png');
+        link.href = highResCanvas.toDataURL('image/png');
         link.click();
     }
 
     function printImage() {
-        // Canvas is already at 15x scale, so we use it directly for 1500% output
-        const dataUrl = canvas.toDataURL('image/png');
+        // Create a high-quality version at 15x scale for printing
+        const highResCanvas = generateHighResCanvas(15);
+        const dataUrl = highResCanvas.toDataURL('image/png');
         const windowContent = `<!DOCTYPE html>
             <html>
                 <head>
