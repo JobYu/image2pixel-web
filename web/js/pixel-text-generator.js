@@ -38,19 +38,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
+    function getScaledCanvas(scaleFactor) {
+        const scaledCanvas = document.createElement('canvas');
+        scaledCanvas.width = canvas.width * scaleFactor;
+        scaledCanvas.height = canvas.height * scaleFactor;
+        const scaledCtx = scaledCanvas.getContext('2d');
+        scaledCtx.imageSmoothingEnabled = false;
+        scaledCtx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+        return scaledCanvas;
+    }
+
     function saveImage() {
+        const scaledCanvas = getScaledCanvas(15);
         const link = document.createElement('a');
         link.download = 'pixel-text-art.png';
-        link.href = canvas.toDataURL('image/png');
+        link.href = scaledCanvas.toDataURL('image/png');
         link.click();
     }
 
     function printImage() {
-        const dataUrl = canvas.toDataURL('image/png');
+        const scaledCanvas = getScaledCanvas(15);
+        const dataUrl = scaledCanvas.toDataURL('image/png');
         const windowContent = `<!DOCTYPE html>
             <html>
                 <head><title>Print</title></head>
-                <body><img src="${dataUrl}"></body>
+                <body><img src="${dataUrl}" style="width: 100%;"></body>
             </html>`;
         const printWin = window.open('', '', 'width=800,height=600');
         printWin.document.open();

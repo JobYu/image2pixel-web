@@ -25,4 +25,7 @@
     image-rendering: -webkit-crisp-edges;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
+    width: auto;
+    height: auto;
+    max-width: 100%;
 }
