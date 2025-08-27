@@ -4,11 +4,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ctx = canvas.getContext('2d');
     const saveButton = document.getElementById('saveButton');
     const printButton = document.getElementById('printButton');
+    const showGridCheckbox = document.getElementById('showGrid');
 
     const baseFontSize = 12; // Original 12x12 pixel font size
     const scaleFactor = 15; // 1500% scale
     const fontSize = baseFontSize * scaleFactor; // 180px for preview
-    const MAX_CHARS = 10; // Limit input to fewer than or equal to 10 characters
+    const MAX_CHARS = 32; // Limit input to <= 32 characters
     const fontName = 'PixelFont';
     let fontLoaded = false;
 
@@ -111,6 +112,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         const y = Math.floor(canvas.height / 2);
         ctx.fillText(text, x, y);
 
+        // Draw grid if enabled
+        if (showGridCheckbox.checked) {
+            drawGrid();
+        }
+
+    }
+
+    function drawGrid() {
+        const gridSize = fontSize; // 180px (12px * 15 scale factor)
+        
+        ctx.strokeStyle = '#cccccc';
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 0.5; // Make grid semi-transparent
+        
+        // Draw vertical lines
+        for (let x = 0; x <= canvas.width; x += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+        }
+        
+        // Draw horizontal lines
+        for (let y = 0; y <= canvas.height; y += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+        }
+        
+        ctx.globalAlpha = 1.0; // Reset alpha
     }
 
     function getScaledCanvas(scaleFactor) {
@@ -181,6 +213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Enforce maxlength on the input element at DOM level too
     textInput.setAttribute('maxlength', String(MAX_CHARS));
     textInput.addEventListener('input', draw);
+    showGridCheckbox.addEventListener('change', draw);
     saveButton.addEventListener('click', saveImage);
     printButton.addEventListener('click', printImage);
 
