@@ -2,13 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const textInput = document.getElementById('textInput');
     const canvas = document.getElementById('resultCanvas');
     const ctx = canvas.getContext('2d');
-    const showGridCheckbox = document.getElementById('showGrid');
     const saveButton = document.getElementById('saveButton');
     const printButton = document.getElementById('printButton');
 
     const fontSize = 32;
     const fontName = 'PixelFont';
-    const gridColor = '#ccc';
 
     function draw() {
         const text = textInput.value;
@@ -38,28 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Draw text
         ctx.fillText(text, 0, 0);
 
-        if (showGridCheckbox.checked) {
-            drawGrid();
-        }
-    }
-
-    function drawGrid() {
-        ctx.strokeStyle = gridColor;
-        ctx.lineWidth = 1;
-
-        for (let x = 0; x <= canvas.width; x++) {
-            ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, canvas.height);
-            ctx.stroke();
-        }
-
-        for (let y = 0; y <= canvas.height; y++) {
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(canvas.width, y);
-            ctx.stroke();
-        }
     }
 
     function saveImage() {
@@ -86,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     textInput.addEventListener('input', draw);
-    showGridCheckbox.addEventListener('change', draw);
     saveButton.addEventListener('click', saveImage);
     printButton.addEventListener('click', printImage);
 

@@ -21,4 +21,8 @@
 #resultCanvas {
     border: 1px solid #ccc;
     background-color: #f9f9f9;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
 }
