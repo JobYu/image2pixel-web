@@ -25,51 +25,65 @@ document.addEventListener('DOMContentLoaded', async () => {
     function draw() {
         const text = textInput.value || 'Hello World';
         
+        // Ensure we have proper font loaded
+        if (!fontLoaded) {
+            ctx.font = `${fontSize}px Arial`; // Fallback
+        } else {
+            ctx.font = `${fontSize}px ${fontName}`;
+        }
+        
         // Measure text to set canvas size
-        ctx.font = `${fontSize}px ${fontName}`;
         const metrics = ctx.measureText(text);
         const textWidth = Math.ceil(metrics.width);
         const textHeight = fontSize;
         
-        // Add padding for centering
-        const padding = 20;
-        const canvasWidth = Math.max(textWidth + padding * 2, 200);
-        const canvasHeight = Math.max(textHeight + padding * 2, 80);
+        // Add generous padding for large font
+        const padding = Math.max(60, fontSize * 0.5); // At least 60px or 50% of font size
+        const canvasWidth = Math.max(textWidth + padding * 2, 300);
+        const canvasHeight = Math.max(textHeight + padding * 2, 300);
         
         // Set canvas dimensions
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
         
-        // Also set CSS dimensions to match exactly (prevent scaling)
+        // Set CSS dimensions to exact pixel values to prevent any browser scaling
         canvas.style.width = canvasWidth + 'px';
         canvas.style.height = canvasHeight + 'px';
+        canvas.style.imageRendering = 'pixelated';
+        canvas.style.imageRendering = 'crisp-edges';
 
         // Clear canvas and set white background
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Set font properties for drawing
+        // Set font properties for drawing - reapply after canvas resize
         ctx.font = `${fontSize}px ${fontName}`;
         ctx.fillStyle = '#000000';
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
 
-        // Disable all forms of anti-aliasing and set additional properties
+        // Aggressively disable all forms of anti-aliasing
         ctx.imageSmoothingEnabled = false;
         ctx.webkitImageSmoothingEnabled = false;
         ctx.mozImageSmoothingEnabled = false;
         ctx.msImageSmoothingEnabled = false;
         ctx.oImageSmoothingEnabled = false;
         
-        // Additional canvas properties to ensure crisp rendering
+        // Set the lowest quality to ensure no smoothing
         if (ctx.imageSmoothingQuality) {
             ctx.imageSmoothingQuality = 'low';
         }
         
+        // Additional properties to force pixel-perfect rendering
+        ctx.textRenderingOptimization = 'optimizeSpeed';
+        if (ctx.fontKerning) {
+            ctx.fontKerning = 'none';
+        }
+        
         // Draw text centered
-        const x = canvas.width / 2;
-        const y = canvas.height / 2;
+        const x = Math.floor(canvas.width / 2);
+        const y = Math.floor(canvas.height / 2);
         ctx.fillText(text, x, y);
 
     }
