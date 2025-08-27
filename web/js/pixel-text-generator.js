@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const textInput = document.getElementById('textInput');
     const canvas = document.getElementById('resultCanvas');
     const ctx = canvas.getContext('2d');
@@ -7,18 +7,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fontSize = 32;
     const fontName = 'PixelFont';
+    let fontLoaded = false;
+
+    // Explicitly load the pixel font
+    const pixelFont = new FontFace('PixelFont', 'url(Pixel32ChinesePixelFont-Book.woff)');
+    try {
+        await pixelFont.load();
+        document.fonts.add(pixelFont);
+        fontLoaded = true;
+    } catch (error) {
+        console.warn('Failed to load pixel font:', error);
+        fontLoaded = false;
+    }
 
     function draw() {
-        const text = textInput.value;
+        const text = textInput.value || 'Hello World';
         
         // Measure text to set canvas size
         ctx.font = `${fontSize}px ${fontName}`;
         const metrics = ctx.measureText(text);
         const textWidth = Math.ceil(metrics.width);
-        const textHeight = fontSize; 
+        const textHeight = fontSize;
         
-        canvas.width = textWidth > 0 ? textWidth : 200;
-        canvas.height = textHeight + (fontSize / 2);
+        // Add padding for centering
+        const padding = 20;
+        canvas.width = Math.max(textWidth + padding * 2, 200);
+        canvas.height = Math.max(textHeight + padding * 2, 80);
 
         // Clear canvas and set background
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -28,13 +42,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // Set font properties for drawing
         ctx.font = `${fontSize}px ${fontName}`;
         ctx.fillStyle = '#000';
-        ctx.textBaseline = 'top';
+        ctx.textBaseline = 'middle';
+        ctx.textAlign = 'center';
 
-        // Disable image smoothing to get sharp pixels
+        // Disable all forms of anti-aliasing
         ctx.imageSmoothingEnabled = false;
+        ctx.webkitImageSmoothingEnabled = false;
+        ctx.mozImageSmoothingEnabled = false;
+        ctx.msImageSmoothingEnabled = false;
         
-        // Draw text
-        ctx.fillText(text, 0, 0);
+        // Draw text centered
+        const x = canvas.width / 2;
+        const y = canvas.height / 2;
+        ctx.fillText(text, x, y);
 
     }
 
@@ -43,7 +63,13 @@ document.addEventListener('DOMContentLoaded', () => {
         scaledCanvas.width = canvas.width * scaleFactor;
         scaledCanvas.height = canvas.height * scaleFactor;
         const scaledCtx = scaledCanvas.getContext('2d');
+        
+        // Disable all forms of anti-aliasing for scaling
         scaledCtx.imageSmoothingEnabled = false;
+        scaledCtx.webkitImageSmoothingEnabled = false;
+        scaledCtx.mozImageSmoothingEnabled = false;
+        scaledCtx.msImageSmoothingEnabled = false;
+        
         scaledCtx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
         return scaledCanvas;
     }
@@ -61,8 +87,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const dataUrl = scaledCanvas.toDataURL('image/png');
         const windowContent = `<!DOCTYPE html>
             <html>
-                <head><title>Print</title></head>
-                <body><img src="${dataUrl}" style="width: 100%;"></body>
+                <head>
+                    <title>Print</title>
+                    <style>
+                        body { 
+                            margin: 0; 
+                            padding: 20px; 
+                            display: flex; 
+                            justify-content: center; 
+                            align-items: center; 
+                            min-height: 100vh; 
+                            box-sizing: border-box;
+                        }
+                        img { 
+                            max-width: 100%; 
+                            max-height: 100%; 
+                            image-rendering: -moz-crisp-edges;
+                            image-rendering: -webkit-crisp-edges;
+                            image-rendering: pixelated;
+                            image-rendering: crisp-edges;
+                        }
+                    </style>
+                </head>
+                <body><img src="${dataUrl}"></body>
             </html>`;
         const printWin = window.open('', '', 'width=800,height=600');
         printWin.document.open();
@@ -80,9 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
     saveButton.addEventListener('click', saveImage);
     printButton.addEventListener('click', printImage);
 
-    // Initial draw
-    // Use document.fonts.ready to ensure the font is loaded
-    document.fonts.ready.then(() => {
-        draw();
-    });
+    // Initial draw after font is loaded
+    draw();
 });

@@ -25,7 +25,9 @@ canvas#resultCanvas {
     image-rendering: -webkit-crisp-edges;
     image-rendering: pixelated;
     image-rendering: crisp-edges;
-    width: auto;
-    height: auto;
+    width: auto !important;
+    height: auto !important;
     max-width: 100%;
+    transform: scale(1);
+    transform-origin: top left;
 }
