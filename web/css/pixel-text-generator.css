@@ -65,4 +65,62 @@ canvas#resultCanvas {
     width: auto !important;
     max-width: none !important;
     flex: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+}
+
+/* 响应式设计 - 手机设备 */
+@media screen and (max-width: 768px) {
+    .controls-row {
+        flex-direction: column !important;
+        gap: 15px !important;
+        padding: 15px !important;
+    }
+    
+    .control-item {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+    }
+    
+    .text-input {
+        width: 100% !important;
+        max-width: none !important;
+        font-size: 16px !important; /* 防止iOS自动缩放 */
+    }
+    
+    .button {
+        width: 100% !important;
+        padding: 12px !important;
+        font-size: 16px !important;
+    }
+    
+    .result {
+        min-height: 300px !important;
+        padding: 10px !important;
+    }
+    
+    h1 {
+        font-size: 1.5em !important;
+        text-align: center !important;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .container {
+        padding: 10px !important;
+    }
+    
+    .controls-row {
+        padding: 10px !important;
+        gap: 10px !important;
+    }
+    
+    .result {
+        padding: 5px !important;
+        min-height: 250px !important;
+    }
 }

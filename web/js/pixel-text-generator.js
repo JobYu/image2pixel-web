@@ -10,9 +10,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const MAX_CHARS = 32; // Limit input to <= 32 characters
     const fontName = 'PixelFont';
     
-    // Fixed preview area dimensions
-    const PREVIEW_WIDTH = 800;
-    const PREVIEW_HEIGHT = 400;
+    // Dynamic preview area dimensions based on screen size
+    function getPreviewDimensions() {
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        
+        if (screenWidth <= 480) {
+            // 小手机
+            return { width: Math.min(screenWidth - 40, 350), height: 200 };
+        } else if (screenWidth <= 768) {
+            // 大手机/平板
+            return { width: Math.min(screenWidth - 60, 500), height: 280 };
+        } else {
+            // 桌面
+            return { width: Math.min(screenWidth - 100, 800), height: 400 };
+        }
+    }
     let fontLoaded = false;
 
     // Explicitly load the pixel font
@@ -33,6 +46,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             textInput.value = text;
         }
         
+        // Get dynamic preview dimensions
+        const dimensions = getPreviewDimensions();
+        const PREVIEW_WIDTH = dimensions.width;
+        const PREVIEW_HEIGHT = dimensions.height;
+        
         // Calculate optimal scale factor based on text length and preview area
         let scaleFactor = 15; // Start with 1500% (15x)
         let fontSize = baseFontSize * scaleFactor;
@@ -52,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             textWidth = Math.ceil(metrics.width);
         }
         
-        // Set fixed canvas dimensions
+        // Set dynamic canvas dimensions
         canvas.width = PREVIEW_WIDTH;
         canvas.height = PREVIEW_HEIGHT;
         
@@ -260,6 +278,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     showGridCheckbox.addEventListener('change', draw);
     saveButton.addEventListener('click', saveImage);
     printButton.addEventListener('click', printImage);
+    
+    // Add window resize listener for responsive canvas
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(draw, 150); // Debounce resize events
+    });
 
     // Initial draw after font is loaded
     draw();
