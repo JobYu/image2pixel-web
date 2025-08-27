@@ -68,9 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
         printWin.document.open();
         printWin.document.write(windowContent);
         printWin.document.close();
-        printWin.focus();
-        printWin.print();
-        printWin.close();
+
+        printWin.onload = () => {
+            printWin.focus();
+            printWin.print();
+            printWin.close();
+        };
     }
 
     textInput.addEventListener('input', draw);
@@ -78,6 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
     printButton.addEventListener('click', printImage);
 
     // Initial draw
-    // Use a small timeout to ensure the font is loaded
-    setTimeout(draw, 100);
+    // Use document.fonts.ready to ensure the font is loaded
+    document.fonts.ready.then(() => {
+        draw();
+    });
 });
