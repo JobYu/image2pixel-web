@@ -56,3 +56,10 @@ canvas#resultCanvas {
     position: relative !important;
     display: block !important;
 }
+
+.result {
+    height: auto !important;
+    min-height: 320px !important;
+    max-height: none !important;
+    overflow: auto !important; /* allow scroll instead of squashing */
+}

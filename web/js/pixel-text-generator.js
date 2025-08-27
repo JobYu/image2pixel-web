@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const baseFontSize = 12; // Original 12x12 pixel font size
     const scaleFactor = 15; // 1500% scale
     const fontSize = baseFontSize * scaleFactor; // 180px for preview
+    const MAX_CHARS = 10; // Limit input to fewer than or equal to 10 characters
     const fontName = 'PixelFont';
     let fontLoaded = false;
 
@@ -23,7 +24,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function draw() {
-        const text = textInput.value || 'Hello World';
+        const raw = textInput.value || 'Hello World';
+        const text = (raw || '').slice(0, MAX_CHARS);
+        if (raw !== text) {
+            textInput.value = text;
+        }
         
         // Ensure we have proper font loaded
         if (!fontLoaded) {
@@ -173,6 +178,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    // Enforce maxlength on the input element at DOM level too
+    textInput.setAttribute('maxlength', String(MAX_CHARS));
     textInput.addEventListener('input', draw);
     saveButton.addEventListener('click', saveImage);
     printButton.addEventListener('click', printImage);
