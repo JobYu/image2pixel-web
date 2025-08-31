@@ -263,7 +263,39 @@ document.addEventListener('DOMContentLoaded', async () => {
             tempCtx.fillText(line, centerX, y);
         });
         
+        // Draw grid if enabled
+        if (showGridCheckbox.checked) {
+            drawHighResGrid(tempCtx, tempCanvas, targetScale);
+        }
+        
         return tempCanvas;
+    }
+
+    function drawHighResGrid(ctx, canvas, scaleFactor) {
+        // Each original pixel becomes scaleFactor px when scaled up
+        const pixelSize = scaleFactor;
+        
+        ctx.strokeStyle = '#cccccc';
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 0.3; // Make grid semi-transparent
+        
+        // Draw vertical lines for each pixel
+        for (let x = 0; x <= canvas.width; x += pixelSize) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+        }
+        
+        // Draw horizontal lines for each pixel
+        for (let y = 0; y <= canvas.height; y += pixelSize) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+        }
+        
+        ctx.globalAlpha = 1.0; // Reset alpha
     }
 
     function getScaledCanvas(scaleFactor) {
