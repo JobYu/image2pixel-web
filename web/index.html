@@ -78,6 +78,8 @@
             <input type="file" id="imageInput" accept="image/*" style="display: none;">
             <button id="saveButton" onclick="saveImage()" class="button">Save</button>
             <button id="printButton" onclick="printImage()" class="button">Print</button>
+            <button id="paletteButton" class="button" title="Choose a built-in palette to apply">Palette</button>
+            <span id="selectedPaletteLabel" style="font-size:12px;color:#666"></span>
             
             <div class="control-item">
                 <label for="blockSize">Block Size:</label>
@@ -120,6 +122,20 @@
                 <a href="pixel-text-generator.html" title="Pixel Art Text Generator">像素字生成器</a>
             </div>
         </footer>
+    </div>
+    <div id="paletteModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="margin:0;">Choose Palette</h3>
+                <button id="closePaletteModal" class="button" style="height:auto;padding:6px 10px;">Close</button>
+            </div>
+            <div class="modal-toolbar">
+                <button id="paletteAutoButton" class="button" title="Use automatic quantization (no fixed palette)">Auto (No Palette)</button>
+            </div>
+            <div id="paletteList" class="palette-list">
+                <!-- dynamically populated -->
+            </div>
+        </div>
     </div>
     <script src="js/main.js"></script>
 </body>

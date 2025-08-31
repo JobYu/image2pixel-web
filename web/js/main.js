@@ -13,11 +13,15 @@
 
 let originalImage = null;
 let processedImage = null;
+let selectedPalette = null; // { name: string, colors: [[r,g,b,a], ...] }
+let allPalettes = []; // catalog for modal
 
 const canvas = document.getElementById('resultCanvas');
 const ctx = canvas.getContext('2d');
 const saveButton = document.getElementById('saveButton');
 const printButton = document.getElementById('printButton');
+const paletteButton = document.getElementById('paletteButton');
+const selectedPaletteLabel = document.getElementById('selectedPaletteLabel');
 
 // Initialize canvas with default size to match the container
 canvas.width = 300;
@@ -106,6 +110,181 @@ function processStaticImage(file) {
 document.getElementById('showGrid').addEventListener('change', function() {
     if (originalImage) processImage();
 });
+
+// Palette modal interactions
+if (paletteButton) {
+    paletteButton.addEventListener('click', function() {
+        openPaletteModal();
+    });
+}
+
+function setSelectedPalette(palette) {
+    selectedPalette = palette; // can be null for auto
+    if (palette) {
+        selectedPaletteLabel.textContent = `Using palette: ${palette.name} (${palette.colors.length} colors)`;
+    } else {
+        selectedPaletteLabel.textContent = '';
+    }
+    if (originalImage) processImage();
+}
+
+function openPaletteModal() {
+    const modal = document.getElementById('paletteModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    // lazy load once
+    if (!allPalettes || allPalettes.length === 0) {
+        loadAllPalettes().then(renderPaletteList).catch(() => renderPaletteList());
+    } else {
+        renderPaletteList();
+    }
+}
+
+function closePaletteModal() {
+    const modal = document.getElementById('paletteModal');
+    if (!modal) return;
+    modal.style.display = 'none';
+}
+
+document.getElementById('closePaletteModal')?.addEventListener('click', closePaletteModal);
+document.getElementById('paletteAutoButton')?.addEventListener('click', function() {
+    setSelectedPalette(null);
+    closePaletteModal();
+});
+
+function renderPaletteList() {
+    const list = document.getElementById('paletteList');
+    if (!list) return;
+    list.innerHTML = '';
+    allPalettes.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'palette-card';
+
+        const header = document.createElement('div');
+        header.className = 'palette-card-header';
+        const title = document.createElement('div');
+        title.textContent = `${p.displayName || p.id}`;
+        const applyBtn = document.createElement('button');
+        applyBtn.className = 'button';
+        applyBtn.textContent = 'Use';
+        applyBtn.addEventListener('click', async () => {
+            const colors = p.colors || await fetchAndParseGPL(p.path);
+            setSelectedPalette({ name: p.displayName || p.id, colors });
+            closePaletteModal();
+        });
+        header.appendChild(title);
+        header.appendChild(applyBtn);
+
+        const swatches = document.createElement('div');
+        swatches.className = 'swatches';
+        const previewColors = (p.colors && p.colors.length ? p.colors : p.previewColors || []).slice(0, 64);
+        previewColors.forEach(c => {
+            const s = document.createElement('div');
+            s.className = 'swatch';
+            const [r,g,b,a] = c;
+            s.style.background = `rgba(${r},${g},${b},${(a ?? 255)/255})`;
+            swatches.appendChild(s);
+        });
+
+        card.appendChild(header);
+        card.appendChild(swatches);
+        list.appendChild(card);
+    });
+}
+
+async function loadAllPalettes() {
+    // Static manifests (package.json) under palette/
+    const packageFiles = [
+        'palette/adigunpolack-palettes/package.json',
+        'palette/arne-palettes/package.json',
+        'palette/davitmasia-palettes/package.json',
+        'palette/dawnbringer-palettes/package.json',
+        'palette/endesga-palettes/package.json',
+        'palette/hardware-palettes/package.json',
+        'palette/hyohnoo-palettes/package.json',
+        'palette/javierguerrero-palettes/package.json',
+        'palette/pico8-palette/package.json',
+        'palette/pinetreepizza-palettes/package.json',
+        'palette/software-palettes/package.json',
+        'palette/wplace-palettes/package.json',
+        'palette/zughy-palettes/package.json'
+    ];
+
+    const results = [];
+    for (const pkgPath of packageFiles) {
+        try {
+            const res = await fetch(pkgPath);
+            if (!res.ok) continue;
+            const json = await res.json();
+            const baseDir = pkgPath.substring(0, pkgPath.lastIndexOf('/'));
+            const contributes = json.contributes?.palettes || [];
+            for (const item of contributes) {
+                const id = item.id;
+                const path = `${baseDir}/${item.path.replace(/^\.\//,'')}`;
+                // Try to quickly fetch first few colors for preview without blocking UI too much
+                let previewColors = [];
+                try {
+                    const txt = await (await fetch(path)).text();
+                    previewColors = parseGPLPreview(txt, 64);
+                } catch(e) {}
+                results.push({ id, path, displayName: id, previewColors });
+            }
+        } catch (e) {
+            // ignore individual failures
+        }
+    }
+    allPalettes = results;
+}
+
+function parseGPLPreview(text, limit = 64) {
+    const colors = [];
+    const lines = text.split(/\r?\n/);
+    for (const raw of lines) {
+        if (colors.length >= limit) break;
+        const line = raw.trim();
+        if (!line || line.startsWith('#')) continue;
+        if (/^(GIMP Palette|Name:|Columns:|Channels:)/i.test(line)) continue;
+        const parts = line.split(/\s+/).filter(Boolean);
+        const nums = parts.map(v => parseInt(v, 10)).filter(n => !Number.isNaN(n));
+        if (nums.length >= 3) {
+            const [r,g,b,a] = [nums[0], nums[1], nums[2], (nums[3] ?? 255)];
+            colors.push([clamp255(r), clamp255(g), clamp255(b), clamp255(a)]);
+        }
+    }
+    return colors;
+}
+
+async function fetchAndParseGPL(path) {
+    const res = await fetch(path);
+    const text = await res.text();
+    return parseGPL(text);
+}
+
+function parseGPL(text) {
+    const colors = [];
+    let hasRGBA = false;
+    const lines = text.split(/\r?\n/);
+    for (const raw of lines) {
+        const line = raw.trim();
+        if (!line) continue;
+        if (line.toLowerCase().startsWith('channels:')) {
+            if (/rgba/i.test(line)) hasRGBA = true;
+            continue;
+        }
+        if (line.startsWith('#') || /^(gimp palette|name:|columns:)/i.test(line)) continue;
+        const parts = line.split(/\s+/).filter(Boolean);
+        const nums = parts.map(v => parseInt(v, 10)).filter(n => !Number.isNaN(n));
+        if (nums.length >= 3) {
+            let r = nums[0], g = nums[1], b = nums[2];
+            let a = 255;
+            if (hasRGBA && nums.length >= 4) a = nums[3];
+            colors.push([clamp255(r), clamp255(g), clamp255(b), clamp255(a)]);
+        }
+    }
+    return colors;
+}
+
+function clamp255(v) { return Math.max(0, Math.min(255, v|0)); }
 
 // Add ColorBox class for median cut quantization
 class ColorBox {
@@ -239,9 +418,28 @@ function colorDistance(color1, color2) {
     return Math.sqrt(
         Math.pow(color1[0] - color2[0], 2) +
         Math.pow(color1[1] - color2[1], 2) +
-        Math.pow(color1[2] - color2[2], 2) +
-        Math.pow(color1[3] - color2[3], 2)
+        Math.pow(color1[2] - color2[2], 2)
     );
+}
+
+// Quantize image to a fixed palette
+function quantizeToFixedPalette(imageData, palette) {
+    const data = imageData.data;
+    const colors = palette;
+    for (let i = 0; i < data.length; i += 4) {
+        const pr = data[i], pg = data[i+1], pb = data[i+2], pa = data[i+3];
+        let minD = Infinity;
+        let best = null;
+        for (let j = 0; j < colors.length; j++) {
+            const c = colors[j];
+            const d = (pr - c[0])*(pr - c[0]) + (pg - c[1])*(pg - c[1]) + (pb - c[2])*(pb - c[2]);
+            if (d < minD) { minD = d; best = c; }
+        }
+        data[i] = best[0];
+        data[i+1] = best[1];
+        data[i+2] = best[2];
+        data[i+3] = (best[3] != null ? best[3] : pa);
+    }
 }
 
 // Add this new function to detect background color
@@ -377,8 +575,12 @@ function processImage() {
     // Apply AA removal *before* quantization
     removeAntiAliasing(imageData, backgroundColor);
 
-    // Apply median cut color quantization
-    medianCutQuantization(imageData, colorCount);
+    // Apply quantization
+    if (selectedPalette && selectedPalette.colors && selectedPalette.colors.length) {
+        quantizeToFixedPalette(imageData, selectedPalette.colors);
+    } else {
+        medianCutQuantization(imageData, colorCount);
+    }
     
     // Put processed image back
     processedImage = imageData;

@@ -1,0 +1,16 @@
+{
+  "name": "wplace-palettes",
+  "displayName": "wplace-palettes",
+  "description": "Palettes created by https://wplace.live/",
+  "version": "1.0",
+  "author": { "name": "wplace", "url": "https://wplace.live/" },
+  "publisher": "image2pixel",
+  "categories": [
+    "Palettes"
+  ],
+  "contributes": {
+    "palettes": [
+      { "id": "wplace", "path": "./wplace.gpl" }
+    ]
+  }
+}
