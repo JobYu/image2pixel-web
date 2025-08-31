@@ -16,6 +16,88 @@ let processedImage = null;
 let selectedPalette = null; // { name: string, colors: [[r,g,b,a], ...] }
 let allPalettes = []; // catalog for modal
 
+// Fallback static manifest when fetching package.json is not possible (e.g., opened via file://)
+const FALLBACK_PALETTES = [
+    // adigunpolack-palettes
+    { id: 'AAP-64', path: 'palette/adigunpolack-palettes/aap-64.gpl' },
+    { id: 'AAP-Micro12', path: 'palette/adigunpolack-palettes/aap-micro12.gpl' },
+    { id: 'AAP-Splendor128', path: 'palette/adigunpolack-palettes/aap-splendor128.gpl' },
+    { id: 'AAP-RadiantXV', path: 'palette/adigunpolack-palettes/aap-radiantxv.gpl' },
+    { id: 'SimpleJPC-16', path: 'palette/adigunpolack-palettes/simplejpc-16.gpl' },
+    // arne-palettes
+    { id: 'A64', path: 'palette/arne-palettes/a64.gpl' },
+    { id: 'ARNE16', path: 'palette/arne-palettes/arne16.gpl' },
+    { id: 'ARNE32', path: 'palette/arne-palettes/arne32.gpl' },
+    { id: 'CGArne', path: 'palette/arne-palettes/cg-arne.gpl' },
+    { id: 'Copper Tech', path: 'palette/arne-palettes/copper-tech.gpl' },
+    { id: 'CPC Boy', path: 'palette/arne-palettes/cpc-boy.gpl' },
+    { id: 'Eroge Copper', path: 'palette/arne-palettes/eroge-copper.gpl' },
+    { id: 'JMP', path: 'palette/arne-palettes/jmp.gpl' },
+    { id: 'Psygnosia', path: 'palette/arne-palettes/psygnosia.gpl' },
+    // davitmasia-palettes
+    { id: 'Matriax8c', path: 'palette/davitmasia-palettes/matriax8c.gpl' },
+    // dawnbringer-palettes
+    { id: 'DB16', path: 'palette/dawnbringer-palettes/db16.gpl' },
+    { id: 'DB32', path: 'palette/dawnbringer-palettes/db32.gpl' },
+    // endesga-palettes
+    { id: 'ARQ4', path: 'palette/endesga-palettes/arq4.gpl' },
+    { id: 'ARQ16', path: 'palette/endesga-palettes/arq16.gpl' },
+    { id: 'EDG16', path: 'palette/endesga-palettes/edg16.gpl' },
+    { id: 'EDG32', path: 'palette/endesga-palettes/edg32.gpl' },
+    { id: 'EDG8', path: 'palette/endesga-palettes/edg8.gpl' },
+    { id: 'EN4', path: 'palette/endesga-palettes/en4.gpl' },
+    { id: 'ENOS16', path: 'palette/endesga-palettes/enos16.gpl' },
+    { id: 'HEPT32', path: 'palette/endesga-palettes/hept32.gpl' },
+    // hardware-palettes
+    { id: 'Apple II', path: 'palette/hardware-palettes/apple-ii.gpl' },
+    { id: 'Atari 2600 NTSC', path: 'palette/hardware-palettes/atari2600-ntsc.gpl' },
+    { id: 'Atari 2600 PAL', path: 'palette/hardware-palettes/atari2600-pal.gpl' },
+    { id: 'CGA', path: 'palette/hardware-palettes/cga.gpl' },
+    { id: 'CGA0', path: 'palette/hardware-palettes/cga0.gpl' },
+    { id: 'CGA0 High', path: 'palette/hardware-palettes/cga0hi.gpl' },
+    { id: 'CGA1', path: 'palette/hardware-palettes/cga1.gpl' },
+    { id: 'CGA1 High', path: 'palette/hardware-palettes/cga1hi.gpl' },
+    { id: 'CGA3rd', path: 'palette/hardware-palettes/cga3rd.gpl' },
+    { id: 'CGA3rd High', path: 'palette/hardware-palettes/cga3rdhi.gpl' },
+    { id: 'Commodore Plus/4', path: 'palette/hardware-palettes/commodore-plus4.gpl' },
+    { id: 'Commodore VIC-20', path: 'palette/hardware-palettes/commodore-vic20.gpl' },
+    { id: 'Commodore 64', path: 'palette/hardware-palettes/commodore64.gpl' },
+    { id: 'CPC', path: 'palette/hardware-palettes/cpc.gpl' },
+    { id: 'Game Boy', path: 'palette/hardware-palettes/gameboy.gpl' },
+    { id: 'Game Boy Color Type1', path: 'palette/hardware-palettes/gameboy-color-type1.gpl' },
+    { id: 'Master System', path: 'palette/hardware-palettes/master-system.gpl' },
+    { id: 'MSX1', path: 'palette/hardware-palettes/msx1.gpl' },
+    { id: 'MSX2', path: 'palette/hardware-palettes/msx2.gpl' },
+    { id: 'NES', path: 'palette/hardware-palettes/nes.gpl' },
+    { id: 'NES NTSC', path: 'palette/hardware-palettes/nes-ntsc.gpl' },
+    { id: 'Teletext', path: 'palette/hardware-palettes/teletext.gpl' },
+    { id: 'VGA 13h', path: 'palette/hardware-palettes/vga-13h.gpl' },
+    { id: 'Virtual Boy', path: 'palette/hardware-palettes/virtualboy.gpl' },
+    { id: 'ZX Spectrum', path: 'palette/hardware-palettes/zx-spectrum.gpl' },
+    // hyohnoo-palettes
+    { id: 'mail24', path: 'palette/hyohnoo-palettes/mail24.gpl' },
+    // javierguerrero-palettes
+    { id: 'nyx8', path: 'palette/javierguerrero-palettes/nyx8.gpl' },
+    // pico8-palette
+    { id: 'PICO-8', path: 'palette/pico8-palette/pico-8.gpl' },
+    // pinetreepizza-palettes
+    { id: 'BubbleGum16', path: 'palette/pinetreepizza-palettes/bubblegum-16.gpl' },
+    { id: 'Rosy-42', path: 'palette/pinetreepizza-palettes/rosy-42.gpl' },
+    // software-palettes
+    { id: 'Google UI', path: 'palette/software-palettes/google-ui.gpl' },
+    { id: 'Minecraft', path: 'palette/software-palettes/minecraft.gpl' },
+    { id: 'Monokai', path: 'palette/software-palettes/monokai.gpl' },
+    { id: 'SmileBASIC', path: 'palette/software-palettes/smile-basic.gpl' },
+    { id: 'Solarized', path: 'palette/software-palettes/solarized.gpl' },
+    { id: 'Web Safe Colors', path: 'palette/software-palettes/web-safe-colors.gpl' },
+    { id: 'Win16', path: 'palette/software-palettes/win16.gpl' },
+    { id: 'X11', path: 'palette/software-palettes/x11.gpl' },
+    // wplace-palettes
+    { id: 'wplace', path: 'palette/wplace-palettes/wplace.gpl' },
+    // zughy-palettes
+    { id: 'Zughy-32', path: 'palette/zughy-palettes/zughy-32.gpl' }
+];
+
 const canvas = document.getElementById('resultCanvas');
 const ctx = canvas.getContext('2d');
 const saveButton = document.getElementById('saveButton');
@@ -156,6 +238,14 @@ function renderPaletteList() {
     const list = document.getElementById('paletteList');
     if (!list) return;
     list.innerHTML = '';
+    if (!allPalettes.length) {
+        const info = document.createElement('div');
+        info.style.padding = '8px';
+        info.style.textAlign = 'left';
+        info.textContent = 'No palettes found. If you opened this file directly, please run it via a local web server to enable loading built-in palettes.';
+        list.appendChild(info);
+        return;
+    }
     allPalettes.forEach(p => {
         const card = document.createElement('div');
         card.className = 'palette-card';
@@ -234,6 +324,10 @@ async function loadAllPalettes() {
         }
     }
     allPalettes = results;
+    if (!allPalettes.length) {
+        // fallback to static list without previews
+        allPalettes = FALLBACK_PALETTES.map(p => ({ id: p.id, path: p.path, displayName: p.id, previewColors: [] }));
+    }
 }
 
 function parseGPLPreview(text, limit = 64) {
