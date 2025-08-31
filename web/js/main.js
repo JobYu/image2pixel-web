@@ -17,88 +17,6 @@ let selectedPalette = null; // { name: string, colors: [[r,g,b,a], ...] }
 let allPalettes = []; // catalog for modal
 let palettesLoaded = false;
 
-// Fallback static manifest when fetching package.json is not possible (e.g., opened via file://)
-const FALLBACK_PALETTES = [
-    // adigunpolack-palettes
-    { id: 'AAP-64', path: 'palette/adigunpolack-palettes/aap-64.gpl' },
-    { id: 'AAP-Micro12', path: 'palette/adigunpolack-palettes/aap-micro12.gpl' },
-    { id: 'AAP-Splendor128', path: 'palette/adigunpolack-palettes/aap-splendor128.gpl' },
-    { id: 'AAP-RadiantXV', path: 'palette/adigunpolack-palettes/aap-radiantxv.gpl' },
-    { id: 'SimpleJPC-16', path: 'palette/adigunpolack-palettes/simplejpc-16.gpl' },
-    // arne-palettes
-    { id: 'A64', path: 'palette/arne-palettes/a64.gpl' },
-    { id: 'ARNE16', path: 'palette/arne-palettes/arne16.gpl' },
-    { id: 'ARNE32', path: 'palette/arne-palettes/arne32.gpl' },
-    { id: 'CGArne', path: 'palette/arne-palettes/cg-arne.gpl' },
-    { id: 'Copper Tech', path: 'palette/arne-palettes/copper-tech.gpl' },
-    { id: 'CPC Boy', path: 'palette/arne-palettes/cpc-boy.gpl' },
-    { id: 'Eroge Copper', path: 'palette/arne-palettes/eroge-copper.gpl' },
-    { id: 'JMP', path: 'palette/arne-palettes/jmp.gpl' },
-    { id: 'Psygnosia', path: 'palette/arne-palettes/psygnosia.gpl' },
-    // davitmasia-palettes
-    { id: 'Matriax8c', path: 'palette/davitmasia-palettes/matriax8c.gpl' },
-    // dawnbringer-palettes
-    { id: 'DB16', path: 'palette/dawnbringer-palettes/db16.gpl' },
-    { id: 'DB32', path: 'palette/dawnbringer-palettes/db32.gpl' },
-    // endesga-palettes
-    { id: 'ARQ4', path: 'palette/endesga-palettes/arq4.gpl' },
-    { id: 'ARQ16', path: 'palette/endesga-palettes/arq16.gpl' },
-    { id: 'EDG16', path: 'palette/endesga-palettes/edg16.gpl' },
-    { id: 'EDG32', path: 'palette/endesga-palettes/edg32.gpl' },
-    { id: 'EDG8', path: 'palette/endesga-palettes/edg8.gpl' },
-    { id: 'EN4', path: 'palette/endesga-palettes/en4.gpl' },
-    { id: 'ENOS16', path: 'palette/endesga-palettes/enos16.gpl' },
-    { id: 'HEPT32', path: 'palette/endesga-palettes/hept32.gpl' },
-    // hardware-palettes
-    { id: 'Apple II', path: 'palette/hardware-palettes/apple-ii.gpl' },
-    { id: 'Atari 2600 NTSC', path: 'palette/hardware-palettes/atari2600-ntsc.gpl' },
-    { id: 'Atari 2600 PAL', path: 'palette/hardware-palettes/atari2600-pal.gpl' },
-    { id: 'CGA', path: 'palette/hardware-palettes/cga.gpl' },
-    { id: 'CGA0', path: 'palette/hardware-palettes/cga0.gpl' },
-    { id: 'CGA0 High', path: 'palette/hardware-palettes/cga0hi.gpl' },
-    { id: 'CGA1', path: 'palette/hardware-palettes/cga1.gpl' },
-    { id: 'CGA1 High', path: 'palette/hardware-palettes/cga1hi.gpl' },
-    { id: 'CGA3rd', path: 'palette/hardware-palettes/cga3rd.gpl' },
-    { id: 'CGA3rd High', path: 'palette/hardware-palettes/cga3rdhi.gpl' },
-    { id: 'Commodore Plus/4', path: 'palette/hardware-palettes/commodore-plus4.gpl' },
-    { id: 'Commodore VIC-20', path: 'palette/hardware-palettes/commodore-vic20.gpl' },
-    { id: 'Commodore 64', path: 'palette/hardware-palettes/commodore64.gpl' },
-    { id: 'CPC', path: 'palette/hardware-palettes/cpc.gpl' },
-    { id: 'Game Boy', path: 'palette/hardware-palettes/gameboy.gpl' },
-    { id: 'Game Boy Color Type1', path: 'palette/hardware-palettes/gameboy-color-type1.gpl' },
-    { id: 'Master System', path: 'palette/hardware-palettes/master-system.gpl' },
-    { id: 'MSX1', path: 'palette/hardware-palettes/msx1.gpl' },
-    { id: 'MSX2', path: 'palette/hardware-palettes/msx2.gpl' },
-    { id: 'NES', path: 'palette/hardware-palettes/nes.gpl' },
-    { id: 'NES NTSC', path: 'palette/hardware-palettes/nes-ntsc.gpl' },
-    { id: 'Teletext', path: 'palette/hardware-palettes/teletext.gpl' },
-    { id: 'VGA 13h', path: 'palette/hardware-palettes/vga-13h.gpl' },
-    { id: 'Virtual Boy', path: 'palette/hardware-palettes/virtualboy.gpl' },
-    { id: 'ZX Spectrum', path: 'palette/hardware-palettes/zx-spectrum.gpl' },
-    // hyohnoo-palettes
-    { id: 'mail24', path: 'palette/hyohnoo-palettes/mail24.gpl' },
-    // javierguerrero-palettes
-    { id: 'nyx8', path: 'palette/javierguerrero-palettes/nyx8.gpl' },
-    // pico8-palette
-    { id: 'PICO-8', path: 'palette/pico8-palette/pico-8.gpl' },
-    // pinetreepizza-palettes
-    { id: 'BubbleGum16', path: 'palette/pinetreepizza-palettes/bubblegum-16.gpl' },
-    { id: 'Rosy-42', path: 'palette/pinetreepizza-palettes/rosy-42.gpl' },
-    // software-palettes
-    { id: 'Google UI', path: 'palette/software-palettes/google-ui.gpl' },
-    { id: 'Minecraft', path: 'palette/software-palettes/minecraft.gpl' },
-    { id: 'Monokai', path: 'palette/software-palettes/monokai.gpl' },
-    { id: 'SmileBASIC', path: 'palette/software-palettes/smile-basic.gpl' },
-    { id: 'Solarized', path: 'palette/software-palettes/solarized.gpl' },
-    { id: 'Web Safe Colors', path: 'palette/software-palettes/web-safe-colors.gpl' },
-    { id: 'Win16', path: 'palette/software-palettes/win16.gpl' },
-    { id: 'X11', path: 'palette/software-palettes/x11.gpl' },
-    // wplace-palettes
-    { id: 'wplace', path: 'palette/wplace-palettes/wplace.gpl' },
-    // zughy-palettes
-    { id: 'Zughy-32', path: 'palette/zughy-palettes/zughy-32.gpl' }
-];
-
 const canvas = document.getElementById('resultCanvas');
 const ctx = canvas.getContext('2d');
 const saveButton = document.getElementById('saveButton');
@@ -262,7 +180,7 @@ function renderPaletteList() {
         applyBtn.className = 'button';
         applyBtn.textContent = 'Use';
         applyBtn.addEventListener('click', async () => {
-            const colors = p.colors || await fetchAndParseGPL(p.path);
+            const colors = p.colors;
             setSelectedPalette({ name: p.displayName || p.id, colors });
             closePaletteModal();
         });
@@ -271,7 +189,7 @@ function renderPaletteList() {
 
         const swatches = document.createElement('div');
         swatches.className = 'swatches';
-        const previewColors = (p.colors && p.colors.length ? p.colors : p.previewColors || []).slice(0, 64);
+        const previewColors = (p.colors || []).slice(0, 64);
         previewColors.forEach(c => {
             const s = document.createElement('div');
             s.className = 'swatch';
@@ -287,99 +205,14 @@ function renderPaletteList() {
 }
 
 async function loadAllPalettes() {
-    // Static manifests (package.json) under palette/
-    const packageFiles = [
-        'palette/adigunpolack-palettes/package.json',
-        'palette/arne-palettes/package.json',
-        'palette/davitmasia-palettes/package.json',
-        'palette/dawnbringer-palettes/package.json',
-        'palette/endesga-palettes/package.json',
-        'palette/hardware-palettes/package.json',
-        'palette/hyohnoo-palettes/package.json',
-        'palette/javierguerrero-palettes/package.json',
-        'palette/pico8-palette/package.json',
-        'palette/pinetreepizza-palettes/package.json',
-        'palette/software-palettes/package.json',
-        'palette/wplace-palettes/package.json',
-        'palette/zughy-palettes/package.json'
-    ];
-
-    const results = [];
-    for (const pkgPath of packageFiles) {
-        try {
-            const res = await fetch(pkgPath);
-            if (!res.ok) continue;
-            const json = await res.json();
-            const baseDir = pkgPath.substring(0, pkgPath.lastIndexOf('/'));
-            const contributes = json.contributes?.palettes || [];
-            for (const item of contributes) {
-                const id = item.id;
-                const path = `${baseDir}/${item.path.replace(/^\.\//,'')}`;
-                // Try to quickly fetch first few colors for preview without blocking UI too much
-                let previewColors = [];
-                try {
-                    const txt = await (await fetch(path)).text();
-                    previewColors = parseGPLPreview(txt, 64);
-                } catch(e) {}
-                results.push({ id, path, displayName: id, previewColors });
-            }
-        } catch (e) {
-            // ignore individual failures
-        }
+    try {
+        const res = await fetch('palette/palettes.json');
+        const palettes = await res.json();
+        allPalettes = palettes.map(p => ({ ...p, displayName: p.id }));
+    } catch (e) {
+        console.error("Failed to load palettes.json:", e);
+        allPalettes = [];
     }
-    allPalettes = results;
-    if (!allPalettes.length) {
-        // fallback to static list without previews
-        allPalettes = FALLBACK_PALETTES.map(p => ({ id: p.id, path: p.path, displayName: p.id, previewColors: [] }));
-    }
-}
-
-function parseGPLPreview(text, limit = 64) {
-    const colors = [];
-    const lines = text.split(/\r?\n/);
-    for (const raw of lines) {
-        if (colors.length >= limit) break;
-        const line = raw.trim();
-        if (!line || line.startsWith('#')) continue;
-        if (/^(GIMP Palette|Name:|Columns:|Channels:)/i.test(line)) continue;
-        const parts = line.split(/\s+/).filter(Boolean);
-        const nums = parts.map(v => parseInt(v, 10)).filter(n => !Number.isNaN(n));
-        if (nums.length >= 3) {
-            const [r,g,b,a] = [nums[0], nums[1], nums[2], (nums[3] ?? 255)];
-            colors.push([clamp255(r), clamp255(g), clamp255(b), clamp255(a)]);
-        }
-    }
-    return colors;
-}
-
-async function fetchAndParseGPL(path) {
-    const res = await fetch(path);
-    const text = await res.text();
-    return parseGPL(text);
-}
-
-function parseGPL(text) {
-    const colors = [];
-    let hasRGBA = false;
-    const lines = text.split(/\r?\n/);
-    for (const raw of lines) {
-        const line = raw.trim();
-        if (!line) continue;
-        if (line.toLowerCase().startsWith('channels:')) {
-            if (/rgba/i.test(line)) hasRGBA = true;
-            continue;
-        }
-        if (line.startsWith('#') || /^(gimp palette|name:|columns:)/i.test(line)) continue;
-        const parts = line.split(/\s+/).filter(Boolean);
-        const nums = parts.map(v => parseInt(v, 10)).filter(n => !Number.isNaN(n));
-        if (nums.length >= 3) {
-            let r = nums[0], g = nums[1], b = nums[2];
-            let a = 255;
-            if (hasRGBA && nums.length >= 4) a = nums[3];
-            colors.push([clamp255(r), clamp255(g), clamp255(b), clamp255(a)]);
-        }
-    }
-    return colors;
 }
 
 function clamp255(v) { return Math.max(0, Math.min(255, v|0)); }
