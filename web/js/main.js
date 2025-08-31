@@ -171,21 +171,47 @@ function renderPaletteList() {
     allPalettes.forEach(p => {
         const card = document.createElement('div');
         card.className = 'palette-card';
-
-        const header = document.createElement('div');
-        header.className = 'palette-card-header';
-        const title = document.createElement('div');
-        title.textContent = `${p.displayName || p.id}`;
-        const applyBtn = document.createElement('button');
-        applyBtn.className = 'button';
-        applyBtn.textContent = 'Use';
-        applyBtn.addEventListener('click', async () => {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', async () => {
             const colors = p.colors;
             setSelectedPalette({ name: p.displayName || p.id, colors });
             closePaletteModal();
         });
-        header.appendChild(title);
-        header.appendChild(applyBtn);
+
+        const header = document.createElement('div');
+        header.className = 'palette-card-header';
+        
+        const titleContainer = document.createElement('div');
+        titleContainer.style.flex = '1';
+        
+        const title = document.createElement('div');
+        title.textContent = `${p.displayName || p.id}`;
+        title.style.fontWeight = 'bold';
+        title.style.marginBottom = '2px';
+        
+        const author = document.createElement('div');
+        author.style.fontSize = '12px';
+        author.style.color = '#666';
+        
+        if (p.info && p.info.url) {
+            const authorLink = document.createElement('a');
+            authorLink.href = p.info.url;
+            authorLink.target = '_blank';
+            authorLink.rel = 'noopener noreferrer';
+            authorLink.textContent = p.info.author;
+            authorLink.style.color = '#4CAF50';
+            authorLink.style.textDecoration = 'none';
+            authorLink.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card click when clicking link
+            });
+            author.appendChild(authorLink);
+        } else {
+            author.textContent = p.info?.author || 'Unknown';
+        }
+        
+        titleContainer.appendChild(title);
+        titleContainer.appendChild(author);
+        header.appendChild(titleContainer);
 
         const swatches = document.createElement('div');
         swatches.className = 'swatches';
@@ -206,11 +232,23 @@ function renderPaletteList() {
 
 async function loadAllPalettes() {
     try {
-        const res = await fetch('palette/palettes.json');
-        const palettes = await res.json();
-        allPalettes = palettes.map(p => ({ ...p, displayName: p.id }));
+        const [palettesRes, infoRes] = await Promise.all([
+            fetch('palette/palettes.json'),
+            fetch('palette/palette-info.json')
+        ]);
+        const palettes = await palettesRes.json();
+        const paletteInfo = await infoRes.json();
+        
+        // Sort palettes alphabetically by ID
+        allPalettes = palettes
+            .map(p => ({ 
+                ...p, 
+                displayName: p.id,
+                info: paletteInfo[p.id] || { author: "Unknown", url: "", description: "" }
+            }))
+            .sort((a, b) => a.id.localeCompare(b.id));
     } catch (e) {
-        console.error("Failed to load palettes.json:", e);
+        console.error("Failed to load palettes:", e);
         allPalettes = [];
     }
 }

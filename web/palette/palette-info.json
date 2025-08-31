@@ -1,0 +1,327 @@
+{
+    "AAP-64": {
+      "author": "Adigun A. Polack",
+      "url": "https://twitter.com/AdigunPolack",
+      "description": "64-color palette created by Adigun Polack"
+    },
+    "AAP-Micro12": {
+      "author": "Adigun A. Polack",
+      "url": "https://twitter.com/AdigunPolack",
+      "description": "12-color micro palette by Adigun Polack"
+    },
+    "AAP-RadiantXV": {
+      "author": "Adigun A. Polack",
+      "url": "https://twitter.com/AdigunPolack",
+      "description": "15-color radiant palette by Adigun Polack"
+    },
+    "AAP-Splendor128": {
+      "author": "Adigun A. Polack",
+      "url": "https://twitter.com/AdigunPolack",
+      "description": "128-color splendor palette by Adigun Polack"
+    },
+    "SimpleJPC-16": {
+      "author": "Adigun A. Polack",
+      "url": "https://twitter.com/AdigunPolack",
+      "description": "16-color simple palette by Adigun Polack"
+    },
+    "A64": {
+      "author": "Arne Niklas Jansson",
+      "url": "https://androidarts.com/",
+      "description": "16-color palette inspired by Commodore 64"
+    },
+    "ARNE16": {
+      "author": "Arne Niklas Jansson",
+      "url": "https://androidarts.com/",
+      "description": "16-color palette by Arne Niklas Jansson"
+    },
+    "ARNE32": {
+      "author": "Arne Niklas Jansson",
+      "url": "https://androidarts.com/",
+      "description": "32-color palette by Arne Niklas Jansson"
+    },
+    "CGArne": {
+      "author": "Arne Niklas Jansson",
+      "url": "https://androidarts.com/",
+      "description": "16-color palette by Arne Niklas Jansson"
+    },
+    "Copper Tech": {
+      "author": "Arne Niklas Jansson",
+      "url": "https://androidarts.com/",
+      "description": "16-color tech palette by Arne Niklas Jansson"
+    },
+    "CPC Boy": {
+      "author": "Arne Niklas Jansson",
+      "url": "https://androidarts.com/",
+      "description": "32-color palette inspired by Amstrad CPC"
+    },
+    "Eroge Copper": {
+      "author": "Arne Niklas Jansson",
+      "url": "https://androidarts.com/",
+      "description": "16-color palette for visual novels"
+    },
+    "JMP": {
+      "author": "Arne Niklas Jansson",
+      "url": "https://androidarts.com/",
+      "description": "Japanese Machine Palette by Arne Niklas Jansson"
+    },
+    "Psygnosia": {
+      "author": "Arne Niklas Jansson",
+      "url": "https://androidarts.com/",
+      "description": "16-color palette inspired by Psygnosis games"
+    },
+    "Matriax8c": {
+      "author": "Davit Masia",
+      "url": "https://twitter.com/DavitMasia",
+      "description": "8-color palette by Davit Masia"
+    },
+    "DB16": {
+      "author": "Richard \"DawnBringer\" Fhager",
+      "url": "http://hem.fyristorg.com/dawnbringer/",
+      "description": "16-color palette by DawnBringer"
+    },
+    "DB32": {
+      "author": "Richard \"DawnBringer\" Fhager",
+      "url": "http://hem.fyristorg.com/dawnbringer/",
+      "description": "32-color palette by DawnBringer"
+    },
+    "ARQ4": {
+      "author": "ENDESGA Studios",
+      "url": "https://twitter.com/ENDESGA",
+      "description": "4-color palette by ENDESGA Studios"
+    },
+    "ARQ16": {
+      "author": "ENDESGA Studios",
+      "url": "https://twitter.com/ENDESGA",
+      "description": "16-color palette by ENDESGA Studios"
+    },
+    "EDG16": {
+      "author": "ENDESGA Studios",
+      "url": "https://twitter.com/ENDESGA",
+      "description": "16-color palette by ENDESGA Studios"
+    },
+    "EDG32": {
+      "author": "ENDESGA Studios",
+      "url": "https://twitter.com/ENDESGA",
+      "description": "32-color palette by ENDESGA Studios"
+    },
+    "EDG8": {
+      "author": "ENDESGA Studios",
+      "url": "https://twitter.com/ENDESGA",
+      "description": "8-color palette by ENDESGA Studios"
+    },
+    "EN4": {
+      "author": "ENDESGA Studios",
+      "url": "https://twitter.com/ENDESGA",
+      "description": "4-color palette by ENDESGA Studios"
+    },
+    "ENOS16": {
+      "author": "ENDESGA Studios",
+      "url": "https://twitter.com/ENDESGA",
+      "description": "16-color palette by ENDESGA Studios"
+    },
+    "HEPT32": {
+      "author": "ENDESGA Studios",
+      "url": "https://twitter.com/ENDESGA",
+      "description": "32-color palette by ENDESGA Studios"
+    },
+    "Apple II": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "Apple II computer palette"
+    },
+    "Atari 2600 NTSC": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "Atari 2600 NTSC palette"
+    },
+    "Atari 2600 PAL": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "Atari 2600 PAL palette"
+    },
+    "CGA": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "CGA (Color Graphics Adapter) palette"
+    },
+    "CGA0": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "CGA mode 0 palette"
+    },
+    "CGA0 High": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "CGA mode 0 high intensity palette"
+    },
+    "CGA1": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "CGA mode 1 palette"
+    },
+    "CGA1 High": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "CGA mode 1 high intensity palette"
+    },
+    "CGA3rd": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "CGA third mode palette"
+    },
+    "CGA3rd High": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "CGA third mode high intensity palette"
+    },
+    "Commodore Plus/4": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "Commodore Plus/4 computer palette"
+    },
+    "Commodore VIC-20": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "Commodore VIC-20 computer palette"
+    },
+    "Commodore 64": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "Commodore 64 computer palette"
+    },
+    "CPC": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "Amstrad CPC computer palette"
+    },
+    "Game Boy": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "Nintendo Game Boy palette"
+    },
+    "Game Boy Color Type1": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "Nintendo Game Boy Color type 1 palette"
+    },
+    "Master System": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "Sega Master System palette"
+    },
+    "MSX1": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "MSX1 computer palette"
+    },
+    "MSX2": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "MSX2 computer palette"
+    },
+    "NES": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "Nintendo Entertainment System palette"
+    },
+    "NES NTSC": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "Nintendo Entertainment System NTSC palette"
+    },
+    "Teletext": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "Teletext system palette"
+    },
+    "VGA 13h": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "VGA mode 13h palette"
+    },
+    "Virtual Boy": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "Nintendo Virtual Boy palette"
+    },
+    "ZX Spectrum": {
+      "author": "Hardware Palette",
+      "url": "",
+      "description": "ZX Spectrum computer palette"
+    },
+    "mail24": {
+      "author": "Hyohnoo",
+      "url": "https://twitter.com/Hyohnoo",
+      "description": "24-color palette by Hyohnoo"
+    },
+    "nyx8": {
+      "author": "Javier Guerrero",
+      "url": "https://twitter.com/Xavier_Gd",
+      "description": "8-color palette by Javier Guerrero"
+    },
+    "PICO-8": {
+      "author": "Joseph White",
+      "url": "http://www.pico-8.com/",
+      "description": "PICO-8 fantasy console palette"
+    },
+    "BubbleGum16": {
+      "author": "PineTreePizza",
+      "url": "https://twitter.com/PineTreePizza",
+      "description": "16-color bubblegum palette by PineTreePizza"
+    },
+    "Rosy-42": {
+      "author": "PineTreePizza",
+      "url": "https://twitter.com/PineTreePizza",
+      "description": "42-color rosy palette by PineTreePizza"
+    },
+    "Google UI": {
+      "author": "Software Palette",
+      "url": "",
+      "description": "Google UI color palette"
+    },
+    "Minecraft": {
+      "author": "Software Palette",
+      "url": "",
+      "description": "Minecraft game palette"
+    },
+    "Monokai": {
+      "author": "Software Palette",
+      "url": "",
+      "description": "Monokai color scheme"
+    },
+    "SmileBASIC": {
+      "author": "Software Palette",
+      "url": "",
+      "description": "SmileBASIC programming language palette"
+    },
+    "Solarized": {
+      "author": "Software Palette",
+      "url": "",
+      "description": "Solarized color scheme"
+    },
+    "Web Safe Colors": {
+      "author": "Software Palette",
+      "url": "",
+      "description": "Web-safe color palette"
+    },
+    "Win16": {
+      "author": "Software Palette",
+      "url": "",
+      "description": "Windows 16-color palette"
+    },
+    "X11": {
+      "author": "Software Palette",
+      "url": "",
+      "description": "X11 color palette"
+    },
+    "wplace": {
+      "author": "wplace",
+      "url": "https://wplace.live/",
+      "description": "32-color palette by wplace"
+    },
+    "Zughy-32": {
+      "author": "Zughy",
+      "url": "https://twitter.com/_Zughy",
+      "description": "32-color palette by Zughy"
+    }
+  }

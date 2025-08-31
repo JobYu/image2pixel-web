@@ -410,15 +410,32 @@ h3 {
     border-radius: 6px;
     overflow: hidden;
     background: #fafafa;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.palette-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: #4CAF50;
 }
 
 .palette-card-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    padding: 8px 10px;
+    padding: 12px 12px 8px 12px;
     background: #fff;
     border-bottom: 1px solid var(--border-color);
+}
+
+.palette-card-header a {
+    transition: color 0.2s ease;
+}
+
+.palette-card-header a:hover {
+    color: #45a049 !important;
+    text-decoration: underline !important;
 }
 
 .swatches {
