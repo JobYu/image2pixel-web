@@ -15,6 +15,7 @@ let originalImage = null;
 let processedImage = null;
 let selectedPalette = null; // { name: string, colors: [[r,g,b,a], ...] }
 let allPalettes = []; // catalog for modal
+let palettesLoaded = false;
 
 // Fallback static manifest when fetching package.json is not possible (e.g., opened via file://)
 const FALLBACK_PALETTES = [
@@ -214,11 +215,14 @@ function openPaletteModal() {
     const modal = document.getElementById('paletteModal');
     if (!modal) return;
     modal.style.display = 'flex';
-    // lazy load once
-    if (!allPalettes || allPalettes.length === 0) {
-        loadAllPalettes().then(renderPaletteList).catch(() => renderPaletteList());
-    } else {
+    
+    if (palettesLoaded) {
         renderPaletteList();
+    } else {
+        const list = document.getElementById('paletteList');
+        if (list) {
+            list.innerHTML = '<div style="padding:10px; text-align:left;">Loading palettes...</div>';
+        }
     }
 }
 
@@ -853,5 +857,18 @@ function initWeChatQR() {
     }
 }
 
+function initApp() {
+    initWeChatQR();
+    // Start loading palettes in background
+    loadAllPalettes().then(() => {
+        palettesLoaded = true;
+        // If modal was opened before palettes loaded, render it now.
+        const modal = document.getElementById('paletteModal');
+        if (modal && modal.style.display === 'flex') {
+            renderPaletteList();
+        }
+    });
+}
+
 // 页面加载完成后初始化微信二维码功能
-document.addEventListener('DOMContentLoaded', initWeChatQR);
+document.addEventListener('DOMContentLoaded', initApp);
