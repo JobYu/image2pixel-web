@@ -532,3 +532,62 @@ h3 {
     height: auto;
     border-radius: 4px;
 }
+
+/* Ad Modal Styles */
+.ad-modal {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.ad-modal-content {
+    max-width: 800px;
+    width: 90%;
+    background: #fff;
+    padding: 30px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ad-timer-container {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.ad-timer {
+    font-size: 48px;
+    font-weight: bold;
+    color: var(--button-bg);
+    margin-bottom: 5px;
+}
+
+.ad-timer-text {
+    font-size: 14px;
+    color: #666;
+}
+
+.ad-container {
+    width: 100%;
+    min-height: 250px;
+    background: #f9f9f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    border: 1px dashed #ccc;
+}
+
+.ad-footer-notice {
+    font-size: 14px;
+    color: #d32f2f;
+    background: #ffebee;
+    padding: 10px 15px;
+    border-radius: 4px;
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.ad-close-button {
+    margin-top: 10px;
+}

@@ -24,6 +24,8 @@
 
     <link rel="canonical" href="https://image2pixel.app/">
     <link rel="stylesheet" href="css/style.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7040749430306996"
+     crossorigin="anonymous"></script>
 
     <!-- Schema.org markup for Google+ -->
     <script type="application/ld+json">
@@ -135,6 +137,32 @@
             <div id="paletteList" class="palette-list">
                 <!-- dynamically populated -->
             </div>
+        </div>
+    </div>
+
+    <!-- Ad Modal -->
+    <div id="adModal" class="modal ad-modal" style="display:none;">
+        <div class="modal-content ad-modal-content">
+            <div class="ad-timer-container">
+                <div id="adTimer" class="ad-timer">10</div>
+                <div class="ad-timer-text">Loading advertisement...</div>
+            </div>
+            <div class="ad-container">
+                <!-- Google AdSense Placeholder -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-7040749430306996"
+                     data-ad-slot="YOUR_AD_SLOT"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+            <div class="ad-footer-notice">
+                Traffic limit exceeded. Please view this ad to support our server costs. Thank you for your understanding!
+            </div>
+            <button id="closeAdButton" class="button ad-close-button" style="display:none;">Close Ad</button>
         </div>
     </div>
     <script src="js/main.js"></script>
