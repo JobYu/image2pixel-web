@@ -17,10 +17,6 @@ let selectedPalette = null; // { name: string, colors: [[r,g,b,a], ...] }
 let allPalettes = []; // catalog for modal
 let palettesLoaded = false;
 
-let conversionCount = 0;
-const AD_TRIGGER_THRESHOLD = 3;
-const AD_COUNTDOWN_SECONDS = 10;
-
 const canvas = document.getElementById('resultCanvas');
 const ctx = canvas.getContext('2d');
 const saveButton = document.getElementById('saveButton');
@@ -63,11 +59,6 @@ document.getElementById('imageInput').addEventListener('change', async function(
     // Process new file if one is selected
     const file = e.target.files[0];
     if (!file) return;
-
-    conversionCount++;
-    if (conversionCount >= AD_TRIGGER_THRESHOLD) {
-        showAdModal();
-    }
 
     processStaticImage(file);
 });
@@ -737,49 +728,8 @@ function initWeChatQR() {
     }
 }
 
-function initAdModal() {
-    const closeAdButton = document.getElementById('closeAdButton');
-    if (closeAdButton) {
-        closeAdButton.addEventListener('click', function() {
-            const modal = document.getElementById('adModal');
-            if (modal) {
-                modal.style.display = 'none';
-                conversionCount = 0; // Reset counter after showing ad
-            }
-        });
-    }
-}
-
-function showAdModal() {
-    const modal = document.getElementById('adModal');
-    const timerDisplay = document.getElementById('adTimer');
-    const closeAdButton = document.getElementById('closeAdButton');
-    const timerText = document.querySelector('.ad-timer-text');
-    
-    if (!modal || !timerDisplay || !closeAdButton) return;
-    
-    modal.style.display = 'flex';
-    closeAdButton.style.display = 'none';
-    timerText.textContent = 'Advertisement is showing...';
-    
-    let timeLeft = AD_COUNTDOWN_SECONDS;
-    timerDisplay.textContent = timeLeft;
-    
-    const countdown = setInterval(() => {
-        timeLeft--;
-        timerDisplay.textContent = timeLeft;
-        
-        if (timeLeft <= 0) {
-            clearInterval(countdown);
-            closeAdButton.style.display = 'block';
-            timerText.textContent = 'You can close the ad now';
-        }
-    }, 1000);
-}
-
 function initApp() {
     initWeChatQR();
-    initAdModal();
     // Start loading palettes in background
     loadAllPalettes().then(() => {
         palettesLoaded = true;
