@@ -816,6 +816,10 @@ input[type="range"] {
     height: 150px;
 }
 
+.mobile-only-open {
+    display: none;
+}
+
 /* Responsive Styles */
 @media (max-width: 992px) {
     .preview-area {
@@ -828,22 +832,112 @@ input[type="range"] {
         padding: 0 1rem;
     }
     
+    .hero-title {
+        font-size: 1.5rem;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+        padding: 0 1rem;
+    }
+
     .tool-area {
         padding: 1rem;
     }
     
     .settings-row {
         gap: 1rem;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .control-item {
+        justify-content: space-between;
+    }
+
+    .slider-container {
+        flex: 1;
+        justify-content: flex-end;
+    }
+
+    input[type="range"] {
+        width: 100%;
+        max-width: 150px;
+    }
+
+    .preview-box.original {
+        display: none; /* Hide original image on mobile to focus on result */
+    }
+
+    .image-container {
+        min-height: 300px;
     }
     
-    .footer-top, .footer-bottom {
+    .mobile-only-open {
+        display: flex;
+        justify-content: center;
+        margin-top: 0.5rem;
+    }
+
+    .mobile-only-open .button {
+        width: 100%;
+        padding: 0.75rem;
+    }
+
+    .footer-top {
         flex-direction: column;
         gap: 1.5rem;
+        text-align: center;
+        flex-wrap: wrap;
+    }
+
+    .social-links {
+        justify-content: center;
+        width: 100%;
+        flex-wrap: wrap; /* Allow wrapping */
+        gap: 1rem;
+    }
+
+    .footer-buttons-group {
+        justify-content: center;
+        width: 100%;
+        flex-wrap: wrap; /* Allow wrapping */
+        gap: 0.75rem;
+    }
+
+    .language-selector {
+        margin-left: 0;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .footer-bottom {
+        flex-direction: column;
+        gap: 1rem;
         text-align: center;
     }
     
     .legal-links {
         justify-content: center;
         flex-wrap: wrap;
+    }
+
+    .steps-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-buttons-group {
+        gap: 0.5rem;
+    }
+
+    .footer-btn {
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+
+    .badge-btn img {
+        height: 18px;
     }
 }

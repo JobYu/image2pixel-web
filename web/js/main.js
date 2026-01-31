@@ -51,35 +51,40 @@ menuClose?.addEventListener('click', () => toggleMenu(false));
 menuOverlay?.addEventListener('click', () => toggleMenu(false));
 
 // Handle file input
-document.getElementById('imageInput').addEventListener('change', async function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+const imageInputs = ['imageInput', 'imageInputMobile'];
+imageInputs.forEach(id => {
+    document.getElementById(id)?.addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
 
-    // Clear previous state
-    originalImage = null;
-    processedImage = null;
-    updateButtonStates();
-    
-    const container = document.getElementById('originalImageContainer');
-    container.innerHTML = '<div class="loading">Processing...</div>';
+        // Clear previous state
+        originalImage = null;
+        processedImage = null;
+        updateButtonStates();
+        
+        const container = document.getElementById('originalImageContainer');
+        if (container) container.innerHTML = '<div class="loading">Processing...</div>';
 
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        const img = new Image();
-        img.onload = function() {
-            originalImage = img;
-            container.innerHTML = '';
-            img.id = 'originalImage';
-            container.appendChild(img);
-            
-            // Update info tag
-            originalInfo.textContent = `${img.width}x${img.height}`;
-            
-            processImage();
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                originalImage = img;
+                if (container) {
+                    container.innerHTML = '';
+                    img.id = 'originalImage';
+                    container.appendChild(img);
+                }
+                
+                // Update info tag
+                if (originalInfo) originalInfo.textContent = `${img.width}x${img.height}`;
+                
+                processImage();
+            };
+            img.src = event.target.result;
         };
-        img.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
+    });
 });
 
 // Sliders and Inputs
