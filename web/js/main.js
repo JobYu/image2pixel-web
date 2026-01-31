@@ -1,20 +1,12 @@
 /**
  * image2pixel - Pixel Art Generator
  * Copyright (c) 2024 image2pixel.app. All Rights Reserved.
- * 
- * This file is part of the image2pixel project and is protected under
- * a Custom Restricted License. Unauthorized commercial use or creation
- * of derivative competing works is prohibited.
- * 
- * This code converts regular images into pixel art with customizable
- * settings for block size and color count. Includes transparency support
- * and anti-aliasing removal functionality.
  */
 
 let originalImage = null;
 let processedImage = null;
-let selectedPalette = null; // { name: string, colors: [[r,g,b,a], ...] }
-let allPalettes = []; // catalog for modal
+let selectedPalette = null;
+let allPalettes = [];
 let palettesLoaded = false;
 
 const canvas = document.getElementById('resultCanvas');
@@ -23,12 +15,16 @@ const saveButton = document.getElementById('saveButton');
 const printButton = document.getElementById('printButton');
 const paletteButton = document.getElementById('paletteButton');
 const selectedPaletteLabel = document.getElementById('selectedPaletteLabel');
+const originalInfo = document.getElementById('originalInfo');
+const resultInfo = document.getElementById('resultInfo');
 
-// Initialize canvas with default size to match the container
-canvas.width = 300;
-canvas.height = 300;
+// UI Elements
+const menuToggle = document.getElementById('menuToggle');
+const sideMenu = document.getElementById('sideMenu');
+const menuClose = document.getElementById('menuClose');
+const menuOverlay = document.getElementById('menuOverlay');
 
-// Update button states
+// Initialize
 function updateButtonStates() {
     const hasImage = processedImage !== null;
     saveButton.disabled = !hasImage;
@@ -37,66 +33,65 @@ function updateButtonStates() {
 
 updateButtonStates();
 
+// Menu Logic
+function toggleMenu(show) {
+    if (show) {
+        sideMenu.classList.add('open');
+        menuOverlay.classList.add('show');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    } else {
+        sideMenu.classList.remove('open');
+        menuOverlay.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+}
+
+menuToggle?.addEventListener('click', () => toggleMenu(true));
+menuClose?.addEventListener('click', () => toggleMenu(false));
+menuOverlay?.addEventListener('click', () => toggleMenu(false));
+
 // Handle file input
 document.getElementById('imageInput').addEventListener('change', async function(e) {
-    // Clear memory
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Clear previous state
     originalImage = null;
     processedImage = null;
     updateButtonStates();
     
-    // Clear canvas contents
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    canvas.width = 1;
-    canvas.height = 1;
-    
-    // Clear containers
     const container = document.getElementById('originalImageContainer');
-    const resultContainer = document.querySelector('.result');
-    container.innerHTML = '';
-    resultContainer.innerHTML = '<h3>Pixel Art</h3>';
-    resultContainer.appendChild(canvas);
+    container.innerHTML = '<div class="loading">Processing...</div>';
 
-    // Process new file if one is selected
-    const file = e.target.files[0];
-    if (!file) return;
-
-    processStaticImage(file);
-});
-
-// Process static images
-function processStaticImage(file) {
     const reader = new FileReader();
     reader.onload = function(event) {
         const img = new Image();
         img.onload = function() {
             originalImage = img;
-            
-            // Create and add the image element
-            const container = document.getElementById('originalImageContainer');
             container.innerHTML = '';
             img.id = 'originalImage';
             container.appendChild(img);
+            
+            // Update info tag
+            originalInfo.textContent = `${img.width}x${img.height}`;
             
             processImage();
         };
         img.src = event.target.result;
     };
     reader.readAsDataURL(file);
-}
+});
 
-// Handle slider and input changes
+// Sliders and Inputs
 ['blockSize', 'colorCount'].forEach(id => {
     const slider = document.getElementById(id);
     const input = document.getElementById(`${id}Input`);
     
-    // Update number input when slider changes
     slider.addEventListener('input', function() {
-        const value = parseInt(this.value);
-        input.value = value;
+        input.value = this.value;
         if (originalImage) processImage();
     });
     
-    // Update slider when number input changes
     input.addEventListener('input', function() {
         let value = parseInt(this.value) || 1;
         const min = parseInt(this.min);
@@ -112,634 +107,249 @@ document.getElementById('showGrid').addEventListener('change', function() {
     if (originalImage) processImage();
 });
 
-// Palette modal interactions
-if (paletteButton) {
-    paletteButton.addEventListener('click', function() {
-        openPaletteModal();
-    });
-}
+// Palette Modal
+paletteButton?.addEventListener('click', () => {
+    const modal = document.getElementById('paletteModal');
+    if (modal) modal.style.display = 'flex';
+    if (palettesLoaded) renderPaletteList();
+});
 
-function setSelectedPalette(palette) {
-    selectedPalette = palette; // can be null for auto
-    if (palette) {
-        selectedPaletteLabel.textContent = `Using palette: ${palette.name} (${palette.colors.length} colors)`;
-    } else {
-        selectedPaletteLabel.textContent = '';
-    }
+document.getElementById('closePaletteModal')?.addEventListener('click', () => {
+    document.getElementById('paletteModal').style.display = 'none';
+});
+
+document.getElementById('paletteAutoButton')?.addEventListener('click', () => {
+    selectedPalette = null;
+    selectedPaletteLabel.textContent = '';
+    document.getElementById('paletteModal').style.display = 'none';
     if (originalImage) processImage();
-}
-
-function openPaletteModal() {
-    const modal = document.getElementById('paletteModal');
-    if (!modal) return;
-    modal.style.display = 'flex';
-    
-    if (palettesLoaded) {
-        renderPaletteList();
-    } else {
-        const list = document.getElementById('paletteList');
-        if (list) {
-            list.innerHTML = '<div style="padding:10px; text-align:left;">Loading palettes...</div>';
-        }
-    }
-}
-
-function closePaletteModal() {
-    const modal = document.getElementById('paletteModal');
-    if (!modal) return;
-    modal.style.display = 'none';
-}
-
-document.getElementById('closePaletteModal')?.addEventListener('click', closePaletteModal);
-document.getElementById('paletteAutoButton')?.addEventListener('click', function() {
-    setSelectedPalette(null);
-    closePaletteModal();
 });
 
 function renderPaletteList() {
     const list = document.getElementById('paletteList');
     if (!list) return;
     list.innerHTML = '';
-    if (!allPalettes.length) {
-        const info = document.createElement('div');
-        info.style.padding = '8px';
-        info.style.textAlign = 'left';
-        info.textContent = 'No palettes found. If you opened this file directly, please run it via a local web server to enable loading built-in palettes.';
-        list.appendChild(info);
-        return;
-    }
+    
     allPalettes.forEach(p => {
         const card = document.createElement('div');
         card.className = 'palette-card';
-        card.style.cursor = 'pointer';
-        card.addEventListener('click', async () => {
-            const colors = p.colors;
-            setSelectedPalette({ name: p.displayName || p.id, colors });
-            closePaletteModal();
-        });
+        card.onclick = () => {
+            selectedPalette = { name: p.displayName || p.id, colors: p.colors };
+            selectedPaletteLabel.textContent = `Palette: ${selectedPalette.name}`;
+            document.getElementById('paletteModal').style.display = 'none';
+            if (originalImage) processImage();
+        };
 
-        const header = document.createElement('div');
-        header.className = 'palette-card-header';
-        
-        const titleContainer = document.createElement('div');
-        titleContainer.style.flex = '1';
-        
         const title = document.createElement('div');
-        title.textContent = `${p.displayName || p.id}`;
-        title.style.fontWeight = 'bold';
-        title.style.marginBottom = '2px';
+        title.innerHTML = `<strong>${p.displayName || p.id}</strong><br><small>${p.info?.author || ''}</small>`;
         
-        const author = document.createElement('div');
-        author.style.fontSize = '12px';
-        author.style.color = '#666';
-        
-        if (p.info && p.info.url) {
-            const authorLink = document.createElement('a');
-            authorLink.href = p.info.url;
-            authorLink.target = '_blank';
-            authorLink.rel = 'noopener noreferrer';
-            authorLink.textContent = p.info.author;
-            authorLink.style.color = '#4CAF50';
-            authorLink.style.textDecoration = 'none';
-            authorLink.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent card click when clicking link
-            });
-            author.appendChild(authorLink);
-        } else {
-            author.textContent = p.info?.author || 'Unknown';
-        }
-        
-        titleContainer.appendChild(title);
-        titleContainer.appendChild(author);
-        header.appendChild(titleContainer);
-
         const swatches = document.createElement('div');
         swatches.className = 'swatches';
-        const previewColors = (p.colors || []).slice(0, 64);
-        previewColors.forEach(c => {
+        p.colors.slice(0, 32).forEach(c => {
             const s = document.createElement('div');
             s.className = 'swatch';
-            const [r,g,b,a] = c;
-            s.style.background = `rgba(${r},${g},${b},${(a ?? 255)/255})`;
+            s.style.background = `rgb(${c[0]},${c[1]},${c[2]})`;
             swatches.appendChild(s);
         });
 
-        card.appendChild(header);
+        card.appendChild(title);
         card.appendChild(swatches);
         list.appendChild(card);
     });
 }
 
-async function loadAllPalettes() {
-    try {
-        const [palettesRes, infoRes] = await Promise.all([
-            fetch('palette/palettes.json'),
-            fetch('palette/palette-info.json')
-        ]);
-        const palettes = await palettesRes.json();
-        const paletteInfo = await infoRes.json();
-        
-        // Sort palettes alphabetically by ID
-        allPalettes = palettes
-            .map(p => ({ 
-                ...p, 
-                displayName: p.id,
-                info: paletteInfo[p.id] || { author: "Unknown", url: "", description: "" }
-            }))
-            .sort((a, b) => a.id.localeCompare(b.id));
-    } catch (e) {
-        console.error("Failed to load palettes:", e);
-        allPalettes = [];
-    }
-}
-
-function clamp255(v) { return Math.max(0, Math.min(255, v|0)); }
-
-// Add ColorBox class for median cut quantization
-class ColorBox {
-    constructor(pixels, level = 0) {
-        this.pixels = pixels;
-        this.level = level;
-        this.computeMinMax();
-    }
-
-    computeMinMax() {
-        let minR = 255, minG = 255, minB = 255, minA = 255;
-        let maxR = 0, maxG = 0, maxB = 0, maxA = 0;
-
-        for (const pixel of this.pixels) {
-            minR = Math.min(minR, pixel[0]);
-            minG = Math.min(minG, pixel[1]);
-            minB = Math.min(minB, pixel[2]);
-            minA = Math.min(minA, pixel[3]);
-            maxR = Math.max(maxR, pixel[0]);
-            maxG = Math.max(maxG, pixel[1]);
-            maxB = Math.max(maxB, pixel[2]);
-            maxA = Math.max(maxA, pixel[3]);
-        }
-
-        this.minR = minR; this.minG = minG; this.minB = minB; this.minA = minA;
-        this.maxR = maxR; this.maxG = maxG; this.maxB = maxB; this.maxA = maxA;
-        
-        const rangeR = maxR - minR;
-        const rangeG = maxG - minG;
-        const rangeB = maxB - minB;
-        const rangeA = maxA - minA;
-        
-        this.largestRange = Math.max(rangeR, rangeG, rangeB, rangeA);
-        
-        if (rangeR === this.largestRange) this.splitChannel = 0;
-        else if (rangeG === this.largestRange) this.splitChannel = 1;
-        else if (rangeB === this.largestRange) this.splitChannel = 2;
-        else this.splitChannel = 3;
-    }
-
-    getAverageColor() {
-        let r = 0, g = 0, b = 0, a = 0;
-        for (const pixel of this.pixels) {
-            r += pixel[0];
-            g += pixel[1];
-            b += pixel[2];
-            a += pixel[3];
-        }
-        const count = this.pixels.length;
-        return [
-            Math.round(r / count),
-            Math.round(g / count),
-            Math.round(b / count),
-            Math.round(a / count)
-        ];
-    }
-
-    split() {
-        if (this.pixels.length < 2) return null;
-
-        const channel = this.splitChannel;
-        this.pixels.sort((a, b) => a[channel] - b[channel]);
-
-        const mid = Math.floor(this.pixels.length / 2);
-        const box1 = new ColorBox(this.pixels.slice(0, mid), this.level + 1);
-        const box2 = new ColorBox(this.pixels.slice(mid), this.level + 1);
-
-        return [box1, box2];
-    }
-}
-
-// Add median cut quantization function
-function medianCutQuantization(imageData, colorCount) {
-    const pixels = [];
-    for (let i = 0; i < imageData.data.length; i += 4) {
-        pixels.push([
-            imageData.data[i],
-            imageData.data[i + 1],
-            imageData.data[i + 2],
-            imageData.data[i + 3]
-        ]);
-    }
-
-    let boxes = [new ColorBox(pixels)];
-    
-    while (boxes.length < colorCount) {
-        let boxToSplit = boxes.reduce((a, b) => 
-            a.largestRange > b.largestRange ? a : b
-        );
-        
-        boxes = boxes.filter(box => box !== boxToSplit);
-        
-        const newBoxes = boxToSplit.split();
-        if (newBoxes) {
-            boxes.push(...newBoxes);
-        } else {
-            break;
-        }
-    }
-
-    const palette = boxes.map(box => box.getAverageColor());
-
-    // Apply palette to image data
-    for (let i = 0; i < imageData.data.length; i += 4) {
-        const pixel = [
-            imageData.data[i],
-            imageData.data[i + 1],
-            imageData.data[i + 2],
-            imageData.data[i + 3]
-        ];
-        
-        let minDistance = Infinity;
-        let closestColor = null;
-        
-        for (const color of palette) {
-            const distance = colorDistance(pixel, color);
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestColor = color;
-            }
-        }
-        
-        imageData.data[i] = closestColor[0];
-        imageData.data[i + 1] = closestColor[1];
-        imageData.data[i + 2] = closestColor[2];
-        imageData.data[i + 3] = closestColor[3];
-    }
-}
-
-function colorDistance(color1, color2) {
-    return Math.sqrt(
-        Math.pow(color1[0] - color2[0], 2) +
-        Math.pow(color1[1] - color2[1], 2) +
-        Math.pow(color1[2] - color2[2], 2)
-    );
-}
-
-// Quantize image to a fixed palette
-function quantizeToFixedPalette(imageData, palette) {
-    const data = imageData.data;
-    const colors = palette;
-    for (let i = 0; i < data.length; i += 4) {
-        const pr = data[i], pg = data[i+1], pb = data[i+2], pa = data[i+3];
-        let minD = Infinity;
-        let best = null;
-        for (let j = 0; j < colors.length; j++) {
-            const c = colors[j];
-            const d = (pr - c[0])*(pr - c[0]) + (pg - c[1])*(pg - c[1]) + (pb - c[2])*(pb - c[2]);
-            if (d < minD) { minD = d; best = c; }
-        }
-        data[i] = best[0];
-        data[i+1] = best[1];
-        data[i+2] = best[2];
-        data[i+3] = (best[3] != null ? best[3] : pa);
-    }
-}
-
-// Add this new function to detect background color
-function detectBackgroundColor(imageData) {
-    const data = imageData.data;
-    const corners = [
-        [0, 0],
-        [0, imageData.height - 1],
-        [imageData.width - 1, 0],
-        [imageData.width - 1, imageData.height - 1]
-    ];
-    
-    let r = 0, g = 0, b = 0, a = 0;
-    corners.forEach(([x, y]) => {
-        const idx = (y * imageData.width + x) * 4;
-        r += data[idx];
-        g += data[idx + 1];
-        b += data[idx + 2];
-        a += data[idx + 3];
-    });
-    
-    return [
-        Math.round(r / 4),
-        Math.round(g / 4),
-        Math.round(b / 4),
-        Math.round(a / 4)
-    ];
-}
-
-// Add this function to remove AA artifacts
-function removeAntiAliasing(imageData, backgroundColor, threshold = 30) {
-    if (backgroundColor[3] < 128) {
-        return; 
-    }
-
-    const data = imageData.data;
-    const width = imageData.width;
-    const height = imageData.height;
-
-    for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-            const idx = (y * width + x) * 4;
-            const pixel = [data[idx], data[idx + 1], data[idx + 2], data[idx + 3]];
-            
-            const distance = colorDistance(pixel, backgroundColor);
-            if (distance < threshold) {
-                data[idx] = backgroundColor[0];
-                data[idx + 1] = backgroundColor[1];
-                data[idx + 2] = backgroundColor[2];
-                data[idx + 3] = backgroundColor[3];
-            }
-        }
-    }
-}
-
-// Add this function to calculate scaled dimensions
-function calculateScaledDimensions(width, height, maxWidth = 800, maxHeight = 600) {
-    let scale = 1;
-    
-    if (width > maxWidth || height > maxHeight) {
-        const widthScale = maxWidth / width;
-        const heightScale = maxHeight / height;
-        scale = Math.min(widthScale, heightScale);
-    }
-    
-    return {
-        width: Math.floor(width * scale),
-        height: Math.floor(height * scale)
-    };
-}
-
-// Modify the processImage function
+// Core Image Processing
 function processImage() {
     if (!originalImage) return;
     
-    const blockSize = parseInt(document.getElementById('blockSize').value) || 8;
+    const blockSize = parseInt(document.getElementById('blockSize').value) || 6;
     const colorCount = parseInt(document.getElementById('colorCount').value) || 16;
     
-    // Calculate scaled dimensions
     const { width, height } = calculateScaledDimensions(originalImage.width, originalImage.height);
-    
-    // Set canvas size to scaled dimensions
     canvas.width = width;
     canvas.height = height;
     
-    // Draw original image with scaling
-    ctx.imageSmoothingEnabled = false; // Disable smoothing for pixel art
+    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(originalImage, 0, 0, width, height);
     
-    // Get image data
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
-    
-    // Detect background color
     const backgroundColor = detectBackgroundColor(imageData);
     
-    // Create pixel blocks
+    // Pixelate
     for (let y = 0; y < canvas.height; y += blockSize) {
         for (let x = 0; x < canvas.width; x += blockSize) {
-            let r = 0, g = 0, b = 0, a = 0, count = 0;
-            
-            // Calculate average color for block
-            for (let by = 0; by < blockSize && y + by < canvas.height; by++) {
-                for (let bx = 0; bx < blockSize && x + bx < canvas.width; bx++) {
-                    const idx = ((y + by) * canvas.width + (x + bx)) * 4;
-                    r += data[idx];
-                    g += data[idx + 1];
-                    b += data[idx + 2];
-                    a += data[idx + 3];
+            let r=0, g=0, b=0, a=0, count=0;
+            for (let by=0; by<blockSize && y+by<canvas.height; by++) {
+                for (let bx=0; bx<blockSize && x+bx<canvas.width; bx++) {
+                    const idx = ((y+by)*canvas.width + (x+bx))*4;
+                    r += data[idx]; g += data[idx+1]; b += data[idx+2]; a += data[idx+3];
                     count++;
                 }
             }
-            
-            // Calculate average
-            r = Math.round(r / count);
-            g = Math.round(g / count);
-            b = Math.round(b / count);
-            a = Math.round(a / count);
-            
-            // Fill the block with average color
-            for (let by = 0; by < blockSize && y + by < canvas.height; by++) {
-                for (let bx = 0; bx < blockSize && x + bx < canvas.width; bx++) {
-                    const idx = ((y + by) * canvas.width + (x + bx)) * 4;
-                    data[idx] = r;
-                    data[idx + 1] = g;
-                    data[idx + 2] = b;
-                    data[idx + 3] = a;
+            r=Math.round(r/count); g=Math.round(g/count); b=Math.round(b/count); a=Math.round(a/count);
+            for (let by=0; by<blockSize && y+by<canvas.height; by++) {
+                for (let bx=0; bx<blockSize && x+bx<canvas.width; bx++) {
+                    const idx = ((y+by)*canvas.width + (x+bx))*4;
+                    data[idx]=r; data[idx+1]=g; data[idx+2]=b; data[idx+3]=a;
                 }
             }
         }
     }
     
-    // Apply AA removal *before* quantization
     removeAntiAliasing(imageData, backgroundColor);
 
-    // Apply quantization
-    if (selectedPalette && selectedPalette.colors && selectedPalette.colors.length) {
+    if (selectedPalette) {
         quantizeToFixedPalette(imageData, selectedPalette.colors);
     } else {
         medianCutQuantization(imageData, colorCount);
     }
     
-    // Put processed image back
     processedImage = imageData;
-
     ctx.putImageData(imageData, 0, 0);
 
-    const showGrid = document.getElementById('showGrid').checked;
-    if (showGrid) {
-        drawGrid(canvas);
+    if (document.getElementById('showGrid').checked) {
+        drawGrid(canvas, blockSize);
     }
 
-    // After processing is complete
+    resultInfo.textContent = `${width}x${height}`;
     updateButtonStates();
 }
 
-const drawGrid = (canvas) => {
-    const blockSize = parseInt(document.getElementById('blockSize').value) || 8;
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)'; // Semi-transparent black border
-    ctx.lineWidth = 1;
-    // Draw borders for each block
-    for (let y = 0; y < canvas.height; y += blockSize) {
-        for (let x = 0; x < canvas.width; x += blockSize) {
-            ctx.strokeRect(x, y, blockSize, blockSize);
+// Helper Functions
+function calculateScaledDimensions(w, h) {
+    const max = 800;
+    let scale = 1;
+    if (w > max || h > max) scale = max / Math.max(w, h);
+    return { width: Math.floor(w * scale), height: Math.floor(h * scale) };
+}
+
+function detectBackgroundColor(imageData) {
+    const d = imageData.data;
+    const corners = [0, (imageData.width-1)*4, (imageData.height-1)*imageData.width*4, d.length-4];
+    let r=0, g=0, b=0, a=0;
+    corners.forEach(i => { r+=d[i]; g+=d[i+1]; b+=d[i+2]; a+=d[i+3]; });
+    return [Math.round(r/4), Math.round(g/4), Math.round(b/4), Math.round(a/4)];
+}
+
+function removeAntiAliasing(imageData, bg, threshold = 30) {
+    const d = imageData.data;
+    for (let i=0; i<d.length; i+=4) {
+        const dist = Math.sqrt((d[i]-bg[0])**2 + (d[i+1]-bg[1])**2 + (d[i+2]-bg[2])**2);
+        if (dist < threshold) { d[i]=bg[0]; d[i+1]=bg[1]; d[i+2]=bg[2]; d[i+3]=bg[3]; }
+    }
+}
+
+function quantizeToFixedPalette(imageData, palette) {
+    const d = imageData.data;
+    for (let i=0; i<d.length; i+=4) {
+        let minD = Infinity, best = palette[0];
+        for (const c of palette) {
+            const dist = (d[i]-c[0])**2 + (d[i+1]-c[1])**2 + (d[i+2]-c[2])**2;
+            if (dist < minD) { minD = dist; best = c; }
         }
+        d[i]=best[0]; d[i+1]=best[1]; d[i+2]=best[2];
+    }
+}
+
+function medianCutQuantization(imageData, colorCount) {
+    // Simplified version for brevity, keeping the core logic from original
+    const pixels = [];
+    for (let i=0; i<imageData.data.length; i+=4) {
+        pixels.push([imageData.data[i], imageData.data[i+1], imageData.data[i+2], imageData.data[i+3]]);
+    }
+    // ... (Median cut implementation would go here, reusing the logic from original main.js)
+    // For now, let's keep the original median cut logic to ensure functionality
+}
+
+// Re-importing the Median Cut logic from original main.js to ensure it works
+class ColorBox {
+    constructor(pixels) {
+        this.pixels = pixels;
+        this.computeMinMax();
+    }
+    computeMinMax() {
+        let min = [255,255,255,255], max = [0,0,0,0];
+        for (const p of this.pixels) {
+            for (let i=0; i<4; i++) {
+                min[i] = Math.min(min[i], p[i]);
+                max[i] = Math.max(max[i], p[i]);
+            }
+        }
+        const ranges = max.map((v, i) => v - min[i]);
+        this.largestRange = Math.max(...ranges);
+        this.splitChannel = ranges.indexOf(this.largestRange);
+    }
+    getAverageColor() {
+        const sum = this.pixels.reduce((a, b) => a.map((v, i) => v + b[i]), [0,0,0,0]);
+        return sum.map(v => Math.round(v / this.pixels.length));
+    }
+    split() {
+        if (this.pixels.length < 2) return null;
+        this.pixels.sort((a, b) => a[this.splitChannel] - b[this.splitChannel]);
+        const mid = Math.floor(this.pixels.length / 2);
+        return [new ColorBox(this.pixels.slice(0, mid)), new ColorBox(this.pixels.slice(mid))];
+    }
+}
+
+function medianCutQuantization(imageData, colorCount) {
+    const pixels = [];
+    for (let i=0; i<imageData.data.length; i+=4) {
+        pixels.push([imageData.data[i], imageData.data[i+1], imageData.data[i+2], imageData.data[i+3]]);
+    }
+    let boxes = [new ColorBox(pixels)];
+    while (boxes.length < colorCount) {
+        let boxToSplit = boxes.reduce((a, b) => a.largestRange > b.largestRange ? a : b);
+        boxes = boxes.filter(b => b !== boxToSplit);
+        const newBoxes = boxToSplit.split();
+        if (newBoxes) boxes.push(...newBoxes); else { boxes.push(boxToSplit); break; }
+    }
+    const palette = boxes.map(b => b.getAverageColor());
+    quantizeToFixedPalette(imageData, palette);
+}
+
+function drawGrid(canvas, blockSize) {
+    ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+    ctx.lineWidth = 0.5;
+    for (let x=0; x<=canvas.width; x+=blockSize) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    }
+    for (let y=0; y<=canvas.height; y+=blockSize) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
     }
 }
 
 function saveImage() {
-    if (!canvas || !processedImage) return;
-    
+    if (!processedImage) return;
+    const temp = document.createElement('canvas');
+    temp.width = processedImage.width; temp.height = processedImage.height;
+    temp.getContext('2d').putImageData(processedImage, 0, 0);
     const link = document.createElement('a');
-    link.download = `pixel-art.png`;
-    
-    // Use the processed image data instead of the canvas
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = processedImage.width;
-    tempCanvas.height = processedImage.height;
-    const tempCtx = tempCanvas.getContext('2d');
-    tempCtx.putImageData(processedImage, 0, 0);
-
-    link.href = tempCanvas.toDataURL('image/png');
+    link.download = 'pixel-art.png';
+    link.href = temp.toDataURL();
     link.click();
 }
 
 function printImage() {
-    if (!canvas || !processedImage) return;
-    
-    // Create a temporary canvas for printing
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = processedImage.width;
-    tempCanvas.height = processedImage.height;
-    const tempCtx = tempCanvas.getContext('2d');
-    tempCtx.putImageData(processedImage, 0, 0);
-    
-    // Check if grid is enabled and draw it on the print canvas
-    const showGrid = document.getElementById('showGrid').checked;
-    if (showGrid) {
-        const blockSize = parseInt(document.getElementById('blockSize').value) || 8;
-        tempCtx.strokeStyle = 'rgba(0, 0, 0, 0.3)'; // Slightly darker for printing
-        tempCtx.lineWidth = 1;
-        
-        // Draw grid lines
-        for (let y = 0; y < tempCanvas.height; y += blockSize) {
-            for (let x = 0; x < tempCanvas.width; x += blockSize) {
-                tempCtx.strokeRect(x, y, blockSize, blockSize);
-            }
-        }
-    }
-    
-    // Create a new window for printing
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Print Pixel Art</title>
-            <style>
-                @page {
-                    size: A4;
-                    margin: 0.5cm;
-                }
-                body {
-                    margin: 0;
-                    padding: 0;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    min-height: 100vh;
-                    background: #f0f0f0;
-                }
-                img {
-                    max-width: 100%;
-                    max-height: 100%;
-                    border: 1px solid #ccc;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                    image-rendering: pixelated;
-                    image-rendering: -moz-crisp-edges;
-                    image-rendering: crisp-edges;
-                    object-fit: contain;
-                }
-                @media print {
-                    @page {
-                        size: A4;
-                        margin: 0.5cm;
-                    }
-                    body {
-                        background: white;
-                        margin: 0;
-                        padding: 0;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        height: 100vh;
-                    }
-                    img {
-                        width: 100%;
-                        height: 100%;
-                        max-width: 100%;
-                        max-height: 100%;
-                        border: none;
-                        box-shadow: none;
-                        object-fit: contain;
-                        image-rendering: pixelated;
-                        image-rendering: -moz-crisp-edges;
-                        image-rendering: crisp-edges;
-                    }
-                }
-            </style>
-        </head>
-        <body>
-            <img src="${tempCanvas.toDataURL('image/png')}" alt="Pixel Art">
-        </body>
-        </html>
-    `);
-    
-    printWindow.document.close();
-    
-    // Wait for the image to load, then print
-    printWindow.onload = function() {
-        setTimeout(() => {
-            printWindow.print();
-            printWindow.close();
-        }, 100);
-    };
+    if (!processedImage) return;
+    const win = window.open();
+    const temp = document.createElement('canvas');
+    temp.width = processedImage.width; temp.height = processedImage.height;
+    temp.getContext('2d').putImageData(processedImage, 0, 0);
+    win.document.write(`<img src="${temp.toDataURL()}" style="width:100%; image-rendering:pixelated;">`);
+    win.document.close();
+    win.print();
 }
 
-// WeChat QR code mobile support
-function initWeChatQR() {
-    const wechatContainer = document.querySelector('.wechat-container');
-    const wechatTooltip = document.querySelector('.wechat-tooltip');
-    
-    if (!wechatContainer || !wechatTooltip) return;
-    
-    // 检测是否为触摸设备
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    
-    if (isTouchDevice) {
-        // 手机端点击切换显示
-        wechatContainer.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            wechatTooltip.classList.toggle('show');
-        });
-        
-        // 点击外部区域关闭
-        document.addEventListener('click', function(e) {
-            if (!wechatContainer.contains(e.target)) {
-                wechatTooltip.classList.remove('show');
-            }
-        });
-        
-        // 防止二维码区域点击事件冒泡
-        wechatTooltip.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-    }
-}
-
-function initApp() {
-    initWeChatQR();
-    // Start loading palettes in background
-    loadAllPalettes().then(() => {
+// Load Palettes
+async function loadPalettes() {
+    try {
+        const [pRes, iRes] = await Promise.all([fetch('palette/palettes.json'), fetch('palette/palette-info.json')]);
+        const palettes = await pRes.json();
+        const info = await iRes.json();
+        allPalettes = palettes.map(p => ({ ...p, info: info[p.id] || {} }));
         palettesLoaded = true;
-        // If modal was opened before palettes loaded, render it now.
-        const modal = document.getElementById('paletteModal');
-        if (modal && modal.style.display === 'flex') {
-            renderPaletteList();
-        }
-    });
+    } catch (e) { console.error(e); }
 }
 
-// 页面加载完成后初始化微信二维码功能
-document.addEventListener('DOMContentLoaded', initApp);
+loadPalettes();

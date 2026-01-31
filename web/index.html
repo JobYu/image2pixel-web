@@ -48,98 +48,233 @@
     </script>
 </head>
 <body>
-    <div class="container">
-        <h1>image2pixel Pixel Art Converter <span class="version">v1.0.4</span></h1>
-        <div class="description">
-            <p>A simple tool to convert your images into pixel art style. The best pixel art software (pixel art軟體) to convert images.</p>
-            <div class="help-icon" title="How to use:
-1. Click 'Open' to select an image
-2. Adjust 'Block Size' to control pixel size
-3. Adjust 'Color Count' to set the number of colors
-4. Click 'Save' to download your pixel art">?</div>
-        </div>
-        
-        <div class="steam-banner">
-            <a href="https://store.steampowered.com/app/3475120" target="_blank" rel="noopener nofollow" title="Get image2pixel on Steam - Full Desktop Version">
-                <img src="https://store.steampowered.com/favicon.ico" alt="image2pixel on Steam" width="16" height="16">
-                Get the Full desktop version on Steam! 🎮
-            </a>
-            <a href="https://apps.apple.com/us/app/image2pixel/id6745822733" target="_blank" rel="noopener nofollow" title="Download image2pixel from App Store - iOS Version">
-                <img src="badge-download-on-the-app-store.svg" alt="Download on the App Store" width="120" height="40">  
-            </a>
-            <a href="https://play.google.com/store/apps/details?id=com.pixelit.image2pixel&pcampaignid=web_share" target="_blank" rel="noopener nofollow" title="Download image2pixel from Google Play - Android Version">
-                <img src="AndroidAPKBadge.svg" alt="Get it on Google Play" width="120" height="40">
-            </a>
-            <a href="https://image2pixel-help.vercel.app" target="_blank" rel="noopener" class="help-link" title="View Help Documentation and User Guide">
-                <span class="help-icon-link">?</span>
-                使用帮助 / Help
-            </a>
-        </div>
-        
-        <div class="controls-row">
-            <label for="imageInput" class="button">Open</label>
-            <input type="file" id="imageInput" accept="image/*" style="display: none;">
-            <button id="saveButton" onclick="saveImage()" class="button">Save</button>
-            <button id="printButton" onclick="printImage()" class="button">Print</button>
-            <button id="paletteButton" class="button" title="Choose a built-in palette to apply">Palette</button>
-            <span id="selectedPaletteLabel" style="font-size:12px;color:#666"></span>
-            
-            <div class="control-item">
-                <label for="blockSize">Block Size:</label>
-                <div class="slider-container">
-                    <input type="range" id="blockSize" min="2" max="10" value="2">
-                    <input type="number" id="blockSizeInput" class="number-input" min="2" max="10" value="2">
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" title="Menu">
+                    <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+                </button>
+            </div>
+            <div class="header-center">
+                <div class="brand">
+                    <img src="logo.png" alt="image2pixel logo" class="header-logo">
+                    <h1>image2pixel <span class="version">v1.0.4</span></h1>
                 </div>
             </div>
-            
-            <div class="control-item">
-                <label for="colorCount">Color Count:</label>
-                <div class="slider-container">
-                    <input type="range" id="colorCount" min="2" max="64" value="32">
-                    <input type="number" id="colorCountInput" class="number-input" min="2" max="64" value="32">
+            <div class="header-right">
+                <!-- Settings button removed as per request -->
+            </div>
+        </div>
+    </header>
+
+    <nav class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <button class="menu-close" id="menuClose">
+                <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+            <span class="menu-title">MENU</span>
+        </div>
+        <div class="menu-content">
+            <a href="index.html" class="active">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9s1.5.67 1.5 1.5S7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                Pixel Art Converter
+            </a>
+            <a href="support.html">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
+                Support
+            </a>
+        </div>
+    </nav>
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <main class="container">
+        <section class="hero-section">
+            <h2 class="hero-title">Convert Image to Pixel Art</h2>
+            <p class="hero-description">The Pixel Art Converter instantly converts images to pixel art and photos to pixelated graphics.</p>
+        </section>
+
+        <section class="tool-area">
+            <div class="controls-panel">
+                <div class="settings-row">
+                    <div class="control-item">
+                        <label for="blockSize">Block Size:</label>
+                        <div class="slider-container">
+                            <input type="range" id="blockSize" min="2" max="10" value="6">
+                            <input type="number" id="blockSizeInput" class="number-input" min="2" max="10" value="6">
+                        </div>
+                    </div>
+                    
+                    <div class="control-item">
+                        <label for="colorCount">Color Count:</label>
+                        <div class="slider-container">
+                            <input type="range" id="colorCount" min="2" max="64" value="32">
+                            <input type="number" id="colorCountInput" class="number-input" min="2" max="64" value="32">
+                        </div>
+                    </div>
+                    
+                    <div class="control-item">
+                        <label for="showGrid" class="checkbox-label">
+                            <input type="checkbox" id="showGrid">
+                            Show Grid
+                        </label>
+                    </div>
+                </div>
+                <div id="selectedPaletteLabel" class="palette-info-text"></div>
+            </div>
+
+            <div class="preview-area">
+                <div class="preview-box original">
+                    <div class="box-header">
+                        <div class="header-title-group">
+                            <h3>Original Image</h3>
+                            <span class="info-tag" id="originalInfo">0x0</span>
+                        </div>
+                        <div class="box-actions">
+                            <label for="imageInput" class="button primary small-button" title="Open">
+                                <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                            </label>
+                            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+                    <div id="originalImageContainer" class="image-container">
+                        <div class="placeholder">
+                            <svg viewBox="0 0 24 24" width="48" height="48"><path fill="#ccc" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                            <p>Click + Open image to start</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="preview-box result">
+                    <div class="box-header">
+                        <div class="header-title-group">
+                            <h3>Pixel Art</h3>
+                            <span class="info-tag" id="resultInfo">0x0</span>
+                        </div>
+                        <div class="box-actions">
+                            <div class="icon-buttons-group">
+                                <button id="paletteButton" class="button small-button" title="Palette">
+                                    <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9s1.5.67 1.5 1.5S7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                                </button>
+                                <button id="saveButton" onclick="saveImage()" class="button primary small-button" title="Save">
+                                    <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+                                </button>
+                                <button id="printButton" onclick="printImage()" class="button small-button" title="Print">
+                                    <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="image-container">
+                        <canvas id="resultCanvas"></canvas>
+                    </div>
                 </div>
             </div>
-            
-            <div class="control-item">
-                <label for="showGrid">Show Grid:</label>
-                <input type="checkbox" id="showGrid">
+        </section>
+
+        <section class="content-layer">
+            <div class="info-section">
+                <h2>How to Use Pixel Art Converter</h2>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-num">1</div>
+                        <p><strong>Upload:</strong> Click the "Open" button in the Original Image box to select an image. We support JPG, PNG, and WebP formats.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">2</div>
+                        <p><strong>Adjust:</strong> Use the "Block Size" slider to control the pixel density. A larger block size creates a more abstract, retro look.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">3</div>
+                        <p><strong>Palette:</strong> Choose from dozens of built-in palettes like GameBoy or NES to give your art an authentic retro feel.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">4</div>
+                        <p><strong>Export:</strong> Once satisfied, click "Save" in the Pixel Art box to download your masterpiece as a PNG file.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h2>Why Use Our Pixel Art Maker?</h2>
+                <p>Our online <strong>pixel art converter</strong> uses advanced quantization algorithms to transform any photo into stunning pixelated graphics. Whether you're a game developer looking for placeholder assets, or a digital artist exploring the 8-bit aesthetic, image2pixel provides the tools you need.</p>
+            </div>
+
+            <div class="info-section faq">
+                <h2>Frequently Asked Questions</h2>
+                <details open>
+                    <summary>Is this pixel art tool free to use?</summary>
+                    <p>Yes! image2pixel is a free online tool for everyone. We also offer a full desktop version on Steam for professional users who need batch processing and more advanced features.</p>
+                </details>
+                <details open>
+                    <summary>How do I get the best results?</summary>
+                    <p>Start with images that have clear subjects and high contrast. Avoid images with too much fine detail or noise, as they may look cluttered when pixelated.</p>
+                </details>
+                <details open>
+                    <summary>What does the Palette option do?</summary>
+                    <p>The palette option forces the converter to use a specific set of colors. This is essential for creating art that looks like it belongs on specific vintage hardware like the Atari 2600 or the original GameBoy.</p>
+                </details>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="social-links">
+                    <a href="https://github.com/JobYu/image2pixel-web" target="_blank" rel="noopener noreferrer" title="GitHub"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+                    <div class="wechat-container">
+                        <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M8.5 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm7 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM21 10.5c0-3.59-3.806-6.5-8.5-6.5S4 6.91 4 10.5c0 1.93 1.096 3.65 2.81 4.84l-.65 1.95 2.28-1.14c.64.19 1.33.3 2.06.3h.5c-.32-.67-.5-1.41-.5-2.2 0-2.9 2.686-5.25 6-5.25.35 0 .69.03 1.02.09-.01-.13-.02-.26-.02-.39zm-2.5 4.75c0-2.35-2.238-4.25-5-4.25s-5 1.9-5 4.25 2.238 4.25 5 4.25c.44 0 .86-.05 1.26-.14l1.49.75-.43-1.28c.99-.71 1.68-1.74 1.68-2.93z"/></svg>
+                        <div class="wechat-tooltip">
+                            <img src="wechat.png" alt="WeChat QR Code">
+                        </div>
+                    </div>
+                    <div class="footer-buttons-group">
+                        <a href="https://store.steampowered.com/app/3475120" target="_blank" rel="noopener nofollow" class="footer-btn steam-btn">
+                            <img src="https://store.steampowered.com/favicon.ico" alt="Steam" width="16" height="16">
+                            Steam
+                        </a>
+                        <a href="https://apps.apple.com/us/app/image2pixel/id6745822733" target="_blank" rel="noopener nofollow" class="footer-btn badge-btn">
+                            <img src="badge-download-on-the-app-store.svg" alt="App Store" height="24">
+                        </a>
+                        <a href="https://play.google.com/store/apps/details?id=com.pixelit.image2pixel&pcampaignid=web_share" target="_blank" rel="noopener nofollow" class="footer-btn badge-btn">
+                            <img src="AndroidAPKBadge.svg" alt="Google Play" height="24">
+                        </a>
+                        <a href="https://image2pixel-help.vercel.app" target="_blank" rel="noopener" class="footer-btn help-btn">
+                            <span class="help-icon-circle">?</span>
+                            Help
+                        </a>
+                    </div>
+                </div>
+                <div class="language-selector">
+                    <a href="#" class="active">EN</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 <a href="https://image2pixel.app">image2pixel.app</a>. All rights reserved.</p>
+                <div class="legal-links">
+                    <a href="EULA_iOS_Image2pixel.html">iOS Terms</a>
+                    <a href="EULA_Android_Image2pixel.html">Android Terms</a>
+                    <a href="privacy-policy.html">Privacy Policy</a>
+                    <a href="support.html">Support</a>
+                </div>
             </div>
         </div>
-        <div class="preview">
-            <div class="original">
-                <h3>Original Image</h3>
-                <div id="originalImageContainer" class="image-container"></div>
-            </div>
-            <div class="result">
-                <h3>Pixel Art</h3>
-                <canvas id="resultCanvas"></canvas>
-            </div>
-        </div>
-        <footer class="copyright">
-            <p>&copy; 2024 <a href="https://image2pixel.app" target="_blank" rel="noopener" title="Visit Official Website - image2pixel.app">image2pixel.app</a> All rights reserved.</p>
-            <div class="legal-links">
-                <a href="EULA_iOS_Image2pixel.html" target="_blank" title="Read iOS End User License Agreement">iOS Terms of Service</a> | 
-                <a href="EULA_Android_Image2pixel.html" target="_blank" title="Read Android End User License Agreement">Android Terms of Service</a> |
-                <a href="privacy-policy.html" target="_blank" title="Read Privacy Policy and Data Usage Information">Privacy Policy</a> |
-                <a href="support.html" target="_blank" title="Get Technical Support and Contact Information">Support</a> |
-                <a href="pixel-text-generator.html" title="Pixel Art Text Generator">像素字生成器</a>
-            </div>
-        </footer>
-    </div>
+    </footer>
+
     <div id="paletteModal" class="modal" style="display:none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 style="margin:0;">Choose Palette</h3>
-                <button id="closePaletteModal" class="button" style="height:auto;padding:6px 10px;">Close</button>
+                <h3>Choose Palette</h3>
+                <button id="closePaletteModal" class="close-button">&times;</button>
             </div>
             <div class="modal-toolbar">
-                <button id="paletteAutoButton" class="button" title="Use automatic quantization (no fixed palette)">Auto (No Palette)</button>
+                <button id="paletteAutoButton" class="button secondary">Auto (No Palette)</button>
             </div>
             <div id="paletteList" class="palette-list">
                 <!-- dynamically populated -->
             </div>
         </div>
     </div>
+
     <script src="js/main.js"></script>
 </body>
 </html>
