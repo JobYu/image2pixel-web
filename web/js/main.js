@@ -346,13 +346,20 @@ function printImage() {
     win.print();
 }
 
-// Load Palettes
 async function loadPalettes() {
     try {
         const [pRes, iRes] = await Promise.all([fetch('palette/palettes.json'), fetch('palette/palette-info.json')]);
         const palettes = await pRes.json();
         const info = await iRes.json();
+        
+        // Map info and sort: wplace first, then others alphabetically
         allPalettes = palettes.map(p => ({ ...p, info: info[p.id] || {} }));
+        allPalettes.sort((a, b) => {
+            if (a.id === 'wplace') return -1;
+            if (b.id === 'wplace') return 1;
+            return (a.displayName || a.id).localeCompare(b.displayName || b.id);
+        });
+        
         palettesLoaded = true;
     } catch (e) { console.error(e); }
 }
