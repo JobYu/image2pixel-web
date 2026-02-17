@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Set font
         ctx.font = `${fontSize}px "Pixel32"`;
-        
+
         // Measure text
         const metrics = ctx.measureText(text);
         const textWidth = Math.ceil(metrics.width) || 100;
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.font = `${fontSize}px "Pixel32"`;
         ctx.textBaseline = 'middle';
         ctx.textAlign = 'center';
-        
+
         // Use imageRendering: pixelated for the canvas via CSS if needed
         // But here we draw directly
         ctx.fillText(text, canvas.width / 2, canvas.height / 2);
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event Listeners
     pixelTextInput.addEventListener('input', renderText);
-    
+
     textSizeSlider.addEventListener('input', () => {
         textSizeInput.value = textSizeSlider.value;
         renderText();
@@ -125,8 +125,17 @@ document.addEventListener('DOMContentLoaded', () => {
         win.print();
     });
 
-    // Wait for fonts to load
-    document.fonts.ready.then(() => {
-        renderText();
-    });
+    // Wait for fonts to load with a fallback
+    if (document.fonts) {
+        document.fonts.load(`${textSizeSlider.value}px "Pixel32"`).then(() => {
+            renderText();
+        }).catch(err => {
+            console.error("Font loading failed:", err);
+            renderText(); // Try to render anyway
+        });
+
+        document.fonts.ready.then(renderText);
+    } else {
+        setTimeout(renderText, 500); // Old browser fallback
+    }
 });

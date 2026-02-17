@@ -21,6 +21,15 @@
     <link rel="canonical" href="https://www.image2pixel.app/pixel-text-generator.html">
     <link rel="stylesheet" href="css/style.css">
     <style>
+        .font-loader {
+            font-family: 'Pixel32';
+            position: absolute;
+            visibility: hidden;
+            height: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
         .text-input-container {
             margin-bottom: 1.5rem;
         }
@@ -51,6 +60,7 @@
 </head>
 
 <body>
+    <div class="font-loader">Force Load Pixel32</div>
     <header class="main-header">
         <div class="header-container">
             <div class="header-left">
