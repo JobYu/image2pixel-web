@@ -1,3 +1,10 @@
+@font-face {
+    font-family: 'Pixel32';
+    src: url('../Pixel32.v1.9.5.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 :root {
     --primary-color: #4CAF50;
     --primary-hover: #45a049;

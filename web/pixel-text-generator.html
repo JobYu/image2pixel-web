@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Font Generator - Create Pixel Art Text | image2pixel</title>
+    <meta name="description"
+        content="Generate pixel art text with image2pixel's pixel font generator. Create retro 8-bit style text easily. Try it now!">
+    <meta name="keywords"
+        content="pixel font generator, pixel art text, 8-bit text, retro font, pixelated text, image2pixel, pixel art tool">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.image2pixel.app/pixel-text-generator.html">
+    <meta property="og:title" content="Pixel Font Generator - image2pixel">
+    <meta property="og:description" content="Create stunning pixel art text with this easy-to-use generator.">
+    <meta property="og:image" content="https://image2pixel.app/logo.png">
+
+    <link rel="canonical" href="https://www.image2pixel.app/pixel-text-generator.html">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .text-input-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1.1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-family: inherit;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        .canvas-container {
+            font-family: 'Pixel32', sans-serif;
+        }
+
+        #textCanvas {
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" title="Menu">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+                    </svg>
+                </button>
+            </div>
+            <div class="header-center">
+                <div class="brand">
+                    <img src="logo.png" alt="image2pixel logo" class="header-logo">
+                    <h1>image2pixel <span class="version">v1.0.4</span></h1>
+                </div>
+            </div>
+            <div class="header-right"></div>
+        </div>
+    </header>
+
+    <nav class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <button class="menu-close" id="menuClose">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor"
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                </svg>
+            </button>
+            <span class="menu-title">MENU</span>
+        </div>
+        <div class="menu-content">
+            <a href="index.html">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor"
+                        d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9s1.5.67 1.5 1.5S7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
+                </svg>
+                Pixel Art Converter
+            </a>
+            <a href="pixel-text-generator.html" class="active">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor"
+                        d="M12.75 3h-1.5L2 12l1.75 1.75L12 5.5l8.25 8.25L22 12l-9.25-9zM12 18.25L3.75 10 2 11.75 11.25 21h1.5L22 11.75 20.25 10 12 18.25z" />
+                </svg>
+                Pixel Font
+            </a>
+            <a href="support.html">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor"
+                        d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z" />
+                </svg>
+                Support
+            </a>
+        </div>
+    </nav>
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <main class="container">
+        <section class="hero-section">
+            <h2 class="hero-title">Pixel Font Generator</h2>
+            <p class="hero-description">Type your message and transform it into a stunning pixel art masterpiece.</p>
+        </section>
+
+        <section class="tool-area">
+            <div class="controls-panel">
+                <div class="text-input-container">
+                    <input type="text" id="pixelText" class="text-input" placeholder="Type your text here..."
+                        value="image2pixel">
+                </div>
+                <div class="settings-row">
+                    <div class="control-item">
+                        <label for="textSize">Font Size:</label>
+                        <div class="slider-container">
+                            <input type="range" id="textSize" min="16" max="128" value="64">
+                            <input type="number" id="textSizeInput" class="number-input" min="16" max="128" value="64">
+                        </div>
+                    </div>
+
+                    <div class="control-item">
+                        <label for="textColor">Text Color:</label>
+                        <input type="color" id="textColor" value="#4CAF50">
+                    </div>
+
+                    <div class="control-item">
+                        <label for="showGrid" class="checkbox-label">
+                            <input type="checkbox" id="showGrid">
+                            Show Grid
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-area">
+                <div class="preview-box result" style="grid-column: 1 / span 2;">
+                    <div class="box-header">
+                        <div class="header-title-group">
+                            <h3>Text Preview</h3>
+                            <span class="info-tag" id="resultInfo">0x0</span>
+                        </div>
+                        <div class="box-actions">
+                            <div class="icon-buttons-group">
+                                <button id="saveButton" class="button primary small-button" title="Save">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path fill="currentColor"
+                                            d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" />
+                                    </svg>
+                                </button>
+                                <button id="printButton" class="button small-button" title="Print">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path fill="currentColor"
+                                            d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="image-container">
+                        <canvas id="textCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-layer">
+            <div class="info-section">
+                <h2>How to Use Pixel Font Generator</h2>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-num">1</div>
+                        <p><strong>Type:</strong> Enter your text in the input box. The preview will update instantly
+                            using the new Pixel32 font.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">2</div>
+                        <p><strong>Adjust:</strong> Use the "Font Size" slider to scale your text. Larger sizes are
+                            great for banners!</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">3</div>
+                        <p><strong>Color:</strong> Choose a color that fits your design using the color picker.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">4</div>
+                        <p><strong>Export:</strong> Click "Save" to download your pixel text as a transparent PNG file.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="social-links">
+                    <a href="https://github.com/JobYu/image2pixel-web" target="_blank" rel="noopener noreferrer"
+                        title="GitHub"><svg viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="currentColor"
+                                d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                        </svg></a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 <a href="https://image2pixel.app">image2pixel.app</a>. All rights reserved.</p>
+                <div class="legal-links">
+                    <a href="privacy-policy.html">Privacy Policy</a>
+                    <a href="support.html">Support</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/pixel-text-generator.js"></script>
+</body>
+
+</html>
