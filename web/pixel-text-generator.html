@@ -51,10 +51,15 @@
 
         .canvas-container {
             font-family: 'Pixel32', sans-serif;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         #textCanvas {
             image-rendering: pixelated;
+            image-rendering: crisp-edges;
         }
     </style>
 </head>
@@ -132,8 +137,9 @@
                     <div class="control-item">
                         <label for="textSize">Font Size:</label>
                         <div class="slider-container">
-                            <input type="range" id="textSize" min="16" max="128" value="64">
-                            <input type="number" id="textSizeInput" class="number-input" min="16" max="128" value="64">
+                            <input type="range" id="textSize" min="12" max="144" step="12" value="60">
+                            <input type="number" id="textSizeInput" class="number-input" min="12" max="144" step="12"
+                                value="60">
                         </div>
                     </div>
 

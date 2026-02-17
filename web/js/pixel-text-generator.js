@@ -44,12 +44,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const color = textColorInput.value;
         const showGrid = showGridCheckbox.checked;
 
+        // Disable smoothing for sharp pixels
+        ctx.imageSmoothingEnabled = false;
+        ctx.webkitImageSmoothingEnabled = false;
+        ctx.msImageSmoothingEnabled = false;
+
         // Set font
         ctx.font = `${fontSize}px "Pixel32"`;
 
         // Measure text
         const metrics = ctx.measureText(text);
-        const textWidth = Math.ceil(metrics.width) || 100;
+        const textWidth = Math.ceil(metrics.width) || 120;
         const textHeight = fontSize * 1.2; // Approximate height
 
         // Update canvas size
@@ -58,6 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Reset smoothing after resize (internal canvas reset)
+        ctx.imageSmoothingEnabled = false;
+        ctx.webkitImageSmoothingEnabled = false;
+        ctx.msImageSmoothingEnabled = false;
 
         // Draw text
         ctx.fillStyle = color;
@@ -70,7 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 
         if (showGrid) {
-            drawGrid(canvas, 8); // Fixed grid size for visual feedback
+            // Grid matches font pixels: 1 font pixel = fontSize / 12 canvas pixels
+            drawGrid(canvas, fontSize / 12);
         }
 
         resultInfo.textContent = `${canvas.width}x${canvas.height}`;
@@ -102,8 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     textSizeInput.addEventListener('input', () => {
-        let value = parseInt(textSizeInput.value) || 16;
-        value = Math.min(Math.max(value, 16), 128);
+        let value = parseInt(textSizeInput.value) || 12;
+        value = Math.min(Math.max(value, 12), 144);
         textSizeSlider.value = value;
         renderText();
     });
