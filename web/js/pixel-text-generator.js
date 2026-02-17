@@ -44,44 +44,77 @@ document.addEventListener('DOMContentLoaded', () => {
         const color = textColorInput.value;
         const showGrid = showGridCheckbox.checked;
 
+        // Calculate block size (grid cell size) based on 12x12 base font
+        const blockSize = fontSize / 12;
+
         // Disable smoothing for sharp pixels
         ctx.imageSmoothingEnabled = false;
         ctx.webkitImageSmoothingEnabled = false;
         ctx.msImageSmoothingEnabled = false;
 
-        // Set font
+        // Set font to measure
         ctx.font = `${fontSize}px "Pixel32"`;
 
         // Measure text
         const metrics = ctx.measureText(text);
-        const textWidth = Math.ceil(metrics.width) || 120;
-        const textHeight = fontSize * 1.2; // Approximate height
+        // Round up text metrics to next block size to ensure fitting
+        const textWidthRaw = metrics.width;
+        // The font height is roughly the fontSize, but for layout let's follow the block grid
+        const textHeightRaw = fontSize;
 
-        // Update canvas size
-        canvas.width = textWidth + 40; // Padding
-        canvas.height = textHeight + 40; // Padding
+        // Calculate visual width/height snapped to blocks
+        // We add some padding (e.g., 2 blocks on each side)
+        const paddingBlocks = 4;
+        const padding = paddingBlocks * blockSize;
+
+        const minCanvasWidth = textWidthRaw + padding;
+        const minCanvasHeight = textHeightRaw + padding;
+
+        // Snap canvas dimensions to multiples of block size
+        // ensuring an even number of blocks helps with centering if needed, 
+        // but primarily we just want grid alignment.
+        canvas.width = Math.ceil(minCanvasWidth / blockSize) * blockSize;
+        canvas.height = Math.ceil(minCanvasHeight / blockSize) * blockSize;
 
         // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Reset smoothing after resize (internal canvas reset)
+        // Reset smoothing after resize
         ctx.imageSmoothingEnabled = false;
         ctx.webkitImageSmoothingEnabled = false;
         ctx.msImageSmoothingEnabled = false;
 
+        // Calculate centered position snapped to grid
+        // We calculate the top-left coordinate for the text box
+        // and snap it to the nearest block boundary.
+        const startXRaw = (canvas.width - textWidthRaw) / 2;
+        const startYRaw = (canvas.height - textHeightRaw) / 2;
+
+        const startX = Math.floor(startXRaw / blockSize) * blockSize;
+        const startY = Math.floor(startYRaw / blockSize) * blockSize;
+
         // Draw text
         ctx.fillStyle = color;
         ctx.font = `${fontSize}px "Pixel32"`;
-        ctx.textBaseline = 'middle';
-        ctx.textAlign = 'center';
 
-        // Use imageRendering: pixelated for the canvas via CSS if needed
-        // But here we draw directly
-        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+        // Use top-left baseline for predictable grid positioning
+        ctx.textBaseline = 'top';
+        ctx.textAlign = 'left';
+
+        // Adjust Y slightly because textBaseline 'top' might not match the visual top of pixel glyphs 
+        // exactly depending on the font metrics, but for a 12px base pixel font, 
+        // usually 'top' or 'alphabetic' with offset aligns well. 
+        // Let's try drawing at the snapped start position.
+        // Note: measureText might return a width slightly smaller than the visual block width
+        // if the last character has whitespace. 
+        // For centering, using the snapped start positions is the safest bet for grid alignment.
+
+        // Small correction: The font might render slightly offset. 
+        // Pixel32 usually aligns well.
+        ctx.fillText(text, startX, startY);
 
         if (showGrid) {
-            // Grid matches font pixels: 1 font pixel = fontSize / 12 canvas pixels
-            drawGrid(canvas, fontSize / 12);
+            drawGrid(canvas, blockSize);
         }
 
         resultInfo.textContent = `${canvas.width}x${canvas.height}`;
