@@ -55,20 +55,37 @@ document.addEventListener('DOMContentLoaded', () => {
         // Set font to measure
         ctx.font = `${fontSize}px "Pixel32"`;
 
-        // Measure text
-        const metrics = ctx.measureText(text);
-        // Round up text metrics to next block size to ensure fitting
-        const textWidthRaw = metrics.width;
+        // Split text by graphemes to safely handle complex emojis (e.g., skin tones, ZWJ sequences)
+        const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
+        const graphemes = Array.from(segmenter.segment(text)).map(s => s.segment);
+        const emojiBaseSize = 16;
+
+        // Create an offscreen context to accurately measure native emoji widths
+        const emojiMeasureCtx = document.createElement('canvas').getContext('2d');
+        emojiMeasureCtx.font = `${emojiBaseSize}px sans-serif`;
+
+        // Measure text width by summing individual characters
+        // This is necessary because we render characters individually to handle emojis
+        let textWidthRaw = 0;
+        for (const char of graphemes) {
+            const isEmoji = /\p{Extended_Pictographic}/u.test(char) || /\p{Emoji_Presentation}/u.test(char);
+            if (isEmoji) {
+                textWidthRaw += emojiMeasureCtx.measureText(char).width * blockSize + blockSize;
+            } else {
+                textWidthRaw += ctx.measureText(char).width;
+            }
+        }
         // The font height is roughly the fontSize, but for layout let's follow the block grid
         const textHeightRaw = fontSize;
 
-        // Calculate visual width/height snapped to blocks
-        // We add some padding (e.g., 2 blocks on each side)
-        const paddingBlocks = 4;
-        const padding = paddingBlocks * blockSize;
+        // We add enough padding to prevent tall emojis from being clipped by the canvas edges
+        const paddingBlocksX = 8;
+        const paddingBlocksY = 32;
+        const paddingX = paddingBlocksX * blockSize;
+        const paddingY = paddingBlocksY * blockSize;
 
-        const minCanvasWidth = textWidthRaw + padding;
-        const minCanvasHeight = textHeightRaw + padding;
+        const minCanvasWidth = textWidthRaw + paddingX;
+        const minCanvasHeight = textHeightRaw + paddingY;
 
         // Snap canvas dimensions to multiples of block size
         // ensuring an even number of blocks helps with centering if needed, 
@@ -101,17 +118,134 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.textBaseline = 'top';
         ctx.textAlign = 'left';
 
-        // Adjust Y slightly because textBaseline 'top' might not match the visual top of pixel glyphs 
-        // exactly depending on the font metrics, but for a 12px base pixel font, 
-        // usually 'top' or 'alphabetic' with offset aligns well. 
-        // Let's try drawing at the snapped start position.
-        // Note: measureText might return a width slightly smaller than the visual block width
-        // if the last character has whitespace. 
-        // For centering, using the snapped start positions is the safest bet for grid alignment.
+        // Draw text character by character to detect and transform emojis
+        let currentX = startX;
+        const baseSize = 12; // Base size for Pixel32 font
 
-        // Small correction: The font might render slightly offset. 
-        // Pixel32 usually aligns well.
-        ctx.fillText(text, startX, startY);
+        // Dynamic color quantization using the Median Cut algorithm
+        function extractDynamicPalette(imgData, maxColors) {
+            let pixels = [];
+            for (let i = 0; i < imgData.data.length; i += 4) {
+                if (imgData.data[i + 3] > 20) {
+                    pixels.push([imgData.data[i], imgData.data[i + 1], imgData.data[i + 2]]);
+                }
+            }
+            if (pixels.length === 0) return [[0, 0, 0]];
+
+            let buckets = [pixels];
+            while (buckets.length < maxColors) {
+                let maxBucketIdx = -1;
+                let globalMaxRange = -1;
+                let globalSortIdx = 0;
+
+                for (let i = 0; i < buckets.length; i++) {
+                    let pts = buckets[i];
+                    if (pts.length <= 1) continue;
+                    let minR = 255, maxR = 0, minG = 255, maxG = 0, minB = 255, maxB = 0;
+                    for (let p of pts) {
+                        if (p[0] < minR) minR = p[0]; if (p[0] > maxR) maxR = p[0];
+                        if (p[1] < minG) minG = p[1]; if (p[1] > maxG) maxG = p[1];
+                        if (p[2] < minB) minB = p[2]; if (p[2] > maxB) maxB = p[2];
+                    }
+                    let rRange = maxR - minR, gRange = maxG - minG, bRange = maxB - minB;
+                    let maxRange = Math.max(rRange, gRange, bRange);
+
+                    if (maxRange > globalMaxRange) {
+                        globalMaxRange = maxRange;
+                        maxBucketIdx = i;
+                        if (maxRange === rRange) globalSortIdx = 0;
+                        else if (maxRange === gRange) globalSortIdx = 1;
+                        else globalSortIdx = 2;
+                    }
+                }
+
+                if (maxBucketIdx === -1) break; // Cannot split further
+
+                let ptsToSplit = buckets[maxBucketIdx];
+                ptsToSplit.sort((p1, p2) => p1[globalSortIdx] - p2[globalSortIdx]);
+                let mid = Math.floor(ptsToSplit.length / 2);
+                buckets.splice(maxBucketIdx, 1, ptsToSplit.slice(0, mid), ptsToSplit.slice(mid));
+            }
+
+            return buckets.map(pts => {
+                let r = 0, g = 0, b = 0;
+                for (let p of pts) { r += p[0]; g += p[1]; b += p[2]; }
+                return [Math.round(r / pts.length), Math.round(g / pts.length), Math.round(b / pts.length)];
+            });
+        }
+
+        function getNearestPaletteColor(r, g, b, palette) {
+            let minDist = Infinity;
+            let nearest = palette[0];
+            for (const p of palette) {
+                const dist = (r - p[0]) ** 2 + (g - p[1]) ** 2 + (b - p[2]) ** 2;
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearest = p;
+                }
+            }
+            return nearest;
+        }
+
+        for (const char of graphemes) {
+            // Check if the character is an emoji
+            const isEmoji = /\p{Extended_Pictographic}/u.test(char) || /\p{Emoji_Presentation}/u.test(char);
+
+            if (isEmoji) {
+                const activeEmojiSize = 16; // Use 16x16 resolution for emojis
+                const emojiNativeWidth = emojiMeasureCtx.measureText(char).width;
+                // Scale width appropriately
+                const charWidth = (emojiNativeWidth / activeEmojiSize) * activeEmojiSize * blockSize + blockSize;
+
+                // Downsample emoji dynamically using an offscreen canvas
+                const offscreen = document.createElement('canvas');
+                offscreen.width = Math.ceil(emojiNativeWidth) + 8;
+                const bufferHeight = activeEmojiSize + 20; // Extra vertical buffer
+                offscreen.height = bufferHeight;
+                const oCtx = offscreen.getContext('2d', { willReadFrequently: true });
+
+                oCtx.font = `${activeEmojiSize}px sans-serif`;
+                oCtx.textBaseline = 'middle';
+                const middleY = Math.floor(bufferHeight / 2);
+                oCtx.fillText(char, 4, middleY);
+
+                const imgData = oCtx.getImageData(0, 0, offscreen.width, offscreen.height);
+                const data = imgData.data;
+
+                // Extract a custom 16-color palette for this specific emoji
+                // By requesting 16 colors, the iterative median cut algorithm guarantees a balance of color fidelity and retro feel
+                const dynamicPalette = extractDynamicPalette(imgData, 16);
+
+                for (let y = 0; y < offscreen.height; y++) {
+                    for (let x = 0; x < offscreen.width; x++) {
+                        const idx = (y * offscreen.width + x) * 4;
+                        const a = data[idx + 3];
+
+                        if (a > 20) {
+                            const r = data[idx];
+                            const g = data[idx + 1];
+                            const b = data[idx + 2];
+
+                            const [nr, ng, nb] = getNearestPaletteColor(r, g, b, dynamicPalette);
+
+                            ctx.fillStyle = `rgba(${nr},${ng},${nb}, 1)`;
+                            // Map middle of emoji to middle of text line (6px from startY)
+                            // We offset x by -4 because it was drawn at x=4 in offscreen
+                            const renderX = Math.round(currentX) + (x - 4) * blockSize;
+                            const renderY = startY + (6 * blockSize) + (y - middleY) * blockSize;
+                            ctx.fillRect(renderX, renderY, blockSize, blockSize);
+                        }
+                    }
+                }
+
+                // Revert to original text color for subsequent normal characters
+                ctx.fillStyle = color;
+                currentX += charWidth;
+            } else {
+                ctx.fillText(char, Math.round(currentX), startY);
+                currentX += ctx.measureText(char).width;
+            }
+        }
 
         if (showGrid) {
             drawGrid(canvas, blockSize);
