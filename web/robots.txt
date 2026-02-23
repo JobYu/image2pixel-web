@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://image2pixel.app/sitemap.xml
