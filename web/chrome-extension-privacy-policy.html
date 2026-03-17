@@ -80,7 +80,7 @@
         <li>clicks the extension popup and chooses <strong>Select Image</strong></li>
         <li>right-clicks an image and chooses the conversion menu item</li>
       </ul>
-      <p>The extension may temporarily access the selected tab, the selected image element, the selected image URL, and the saved conversion settings required to complete the user-requested conversion.</p>
+      <p>The extension may temporarily access the selected tab, the selected image element, the selected image URL, and the saved conversion settings required to complete the user-requested conversion. The extension does not receive default access to all websites. If direct image fetching is required, Chrome asks the user to approve access for that specific image host.</p>
 
       <h2>Data collection and transmission</h2>
       <p>Image2Pixel Picker does not create user accounts, collect personal identity information, sell user data, or use analytics and advertising trackers.</p>
@@ -95,7 +95,7 @@
         <li><strong>contextMenus</strong>: used to add the right-click conversion action</li>
         <li><strong>scripting</strong>: used to inject the conversion runtime only when the user triggers it</li>
         <li><strong>storage</strong>: used to remember conversion settings</li>
-        <li><strong>&lt;all_urls&gt;</strong>: used to read or fetch the exact image selected by the user on supported webpages</li>
+        <li><strong>optional host permissions</strong>: requested only for the specific image host when the extension must fetch the selected image from its original URL</li>
       </ul>
 
       <h2>Contact</h2>

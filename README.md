@@ -135,7 +135,7 @@ This repository also includes a Chrome Extension in `chrome-extension/` that ope
 4. Return to the page and click the image you want to convert
 5. To convert only one image without entering pick mode, right-click that image and choose `Convert this image to pixel art`
 
-The extension no longer injects its page runtime by default. The content script is injected only when the user opens the popup flow or uses the right-click conversion action.
+The extension no longer injects its page runtime by default. The content script is injected only when the user opens the popup flow or uses the right-click conversion action. If the extension needs to fetch the original image bytes from a specific image host, Chrome will request optional site access for that host instead of granting broad access up front.
 
 ### Chrome Web Store release files
 
