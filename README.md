@@ -116,6 +116,47 @@ Simply clone the repository and open `web/index.html` in your browser. No build 
 git clone htts：//github.com/JobYu/image2pixel-web.git
 ```
 
+## Chrome Extension
+
+This repository also includes a Chrome Extension in `chrome-extension/` that opens a popup for image-picking settings, and can also convert one image via the browser right-click menu.
+
+### Load unpacked
+
+1. Open `chrome://extensions`
+2. Enable `Developer mode`
+3. Click `Load unpacked`
+4. Select the `chrome-extension` folder from this repository
+
+### Usage
+
+1. Open any webpage with images
+2. Click the `Image2Pixel Picker` toolbar icon to open the popup
+3. Adjust `Pixel Size` and `Color Count`, then click the `Select Image` button in the popup
+4. Return to the page and click the image you want to convert
+5. To convert only one image without entering pick mode, right-click that image and choose `Convert this image to pixel art`
+
+The extension no longer injects its page runtime by default. The content script is injected only when the user opens the popup flow or uses the right-click conversion action.
+
+### Chrome Web Store release files
+
+The release-ready store materials live here:
+
+- `chrome-extension/store/chrome-web-store-listing.md`
+- `chrome-extension/store/privacy-policy.md`
+- `chrome-extension/store/release-checklist.md`
+- `web/chrome-extension-privacy-policy.html`
+
+These files include:
+
+- English and Traditional Chinese listing copy
+- Permission justification text
+- An extension-specific privacy policy draft
+- A pre-submission checklist for screenshots, packaging, and dashboard fields
+
+### Packaging for submission
+
+Before uploading to the Chrome Web Store, package the contents of `chrome-extension/` as a ZIP archive. The `store/` folder can stay in the package because it does not affect runtime behavior, but it is safe to exclude if you prefer a smaller upload artifact.
+
 ## License
 
 Copyright © 2024 [image2pixel.app](https://image2pixel.app). All rights reserved.

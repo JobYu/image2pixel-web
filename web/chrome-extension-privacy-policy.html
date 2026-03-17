@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Image2Pixel Picker Privacy Policy</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #faf7f1;
+      --panel: #fffdf8;
+      --text: #2f241b;
+      --muted: #68584b;
+      --accent: #9a5b2d;
+      --border: #e6d9c8;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at top left, rgba(154, 91, 45, 0.12), transparent 30%),
+        linear-gradient(180deg, #fffdf8, var(--bg));
+      color: var(--text);
+    }
+
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 48px 20px 72px;
+    }
+
+    article {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 24px;
+      box-shadow: 0 24px 80px rgba(47, 36, 27, 0.08);
+    }
+
+    h1, h2 {
+      line-height: 1.2;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 2rem;
+    }
+
+    h2 {
+      margin-top: 2rem;
+      font-size: 1.15rem;
+    }
+
+    p, li {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    strong {
+      color: var(--text);
+    }
+
+    a {
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <article>
+      <h1>Image2Pixel Picker Privacy Policy</h1>
+      <p><strong>Last updated:</strong> 2026-03-17</p>
+      <p>Image2Pixel Picker is a Chrome extension that converts a user-selected image on the current webpage into pixel art.</p>
+
+      <h2>What the extension accesses</h2>
+      <p>The extension accesses webpage images only after the user explicitly starts one of these actions:</p>
+      <ul>
+        <li>clicks the extension popup and chooses <strong>Select Image</strong></li>
+        <li>right-clicks an image and chooses the conversion menu item</li>
+      </ul>
+      <p>The extension may temporarily access the selected tab, the selected image element, the selected image URL, and the saved conversion settings required to complete the user-requested conversion.</p>
+
+      <h2>Data collection and transmission</h2>
+      <p>Image2Pixel Picker does not create user accounts, collect personal identity information, sell user data, or use analytics and advertising trackers.</p>
+      <p>Image conversion runs locally in the browser. If the extension needs to read image bytes from the selected image URL, it fetches that image directly in the extension context only to process the image chosen by the user.</p>
+
+      <h2>Data storage</h2>
+      <p>The extension stores only the user's conversion settings in Chrome local storage, including pixel size and color count.</p>
+
+      <h2>Permissions explanation</h2>
+      <ul>
+        <li><strong>activeTab</strong>: used to access the current page only after user action</li>
+        <li><strong>contextMenus</strong>: used to add the right-click conversion action</li>
+        <li><strong>scripting</strong>: used to inject the conversion runtime only when the user triggers it</li>
+        <li><strong>storage</strong>: used to remember conversion settings</li>
+        <li><strong>&lt;all_urls&gt;</strong>: used to read or fetch the exact image selected by the user on supported webpages</li>
+      </ul>
+
+      <h2>Contact</h2>
+      <p>Replace this paragraph with your public support email or support page before linking this page in the Chrome Web Store dashboard.</p>
+      <p>Product site: <a href="https://image2pixel.app">image2pixel.app</a></p>
+    </article>
+  </main>
+</body>
+</html>
