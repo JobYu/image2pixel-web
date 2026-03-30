@@ -3,5 +3,7 @@
 ._*
 .Spotlight-V100
 .Trashes
+dist/
 docs/
 chrome-extension/
+knowledge/
