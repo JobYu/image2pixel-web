@@ -36,7 +36,7 @@ v1.0.0
 
 - Easy-to-use interface
 - Real-time preview
-- Adjustable pixel block size (2-10 pixels)
+- Adjustable pixel block size (2-20 pixels)
 - Customizable color palette (2-64 colors)
 - Download results as PNG
 - No installation required - works in browser
@@ -90,7 +90,7 @@ If you enjoy this web tool, please consider adding the desktop version to your S
 
 - Easy-to-use interface
 - Real-time preview
-- Adjustable pixel block size (2-10 pixels)
+- Adjustable pixel block size (2-20 pixels)
 - Customizable color palette (2-64 colors)
 - Download results as PNG
 - Print results directly from browser
