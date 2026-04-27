@@ -118,7 +118,7 @@ document.getElementById('showGrid').addEventListener('change', function() {
 paletteButton?.addEventListener('click', () => {
     const modal = document.getElementById('paletteModal');
     if (modal) modal.style.display = 'flex';
-    if (palettesLoaded) renderPaletteList();
+    renderPaletteList();
 });
 
 document.getElementById('closePaletteModal')?.addEventListener('click', () => {
@@ -177,6 +177,7 @@ function renderPaletteList() {
 
         if (isCustom) {
             const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
             deleteBtn.className = 'delete-btn';
             deleteBtn.textContent = 'x';
             deleteBtn.title = 'Delete custom palette';
@@ -425,8 +426,8 @@ async function loadPalettes() {
         });
         
         palettesLoaded = true;
-        loadCustomPalettes();
     } catch (e) { console.error(e); }
+    loadCustomPalettes();
 }
 
 loadPalettes();

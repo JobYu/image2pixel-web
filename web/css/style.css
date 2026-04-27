@@ -800,13 +800,13 @@ input[type="range"] {
     border-radius: 50%;
     font-size: 12px;
     cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.2s;
+    display: none;
     z-index: 1;
+    padding: 0;
 }
 
 .palette-card:hover .delete-btn {
-    opacity: 1;
+    display: block;
 }
 
 .palette-card .delete-btn:hover {
@@ -821,6 +821,12 @@ input[type="range"] {
     margin: 0.5rem 0 0.25rem;
     padding-bottom: 0.25rem;
     border-bottom: 1px solid var(--border-color);
+}
+
+.palette-hint {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin: -0.5rem 0 0.25rem;
 }
 
 .swatches {
