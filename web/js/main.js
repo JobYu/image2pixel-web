@@ -8,6 +8,8 @@ let processedImage = null;
 let selectedPalette = null;
 let allPalettes = [];
 let palettesLoaded = false;
+const CUSTOM_PALETTES_KEY = 'image2pixel_custom_palettes';
+let customPalettes = [];
 
 const canvas = document.getElementById('resultCanvas');
 const ctx = canvas.getContext('2d');
@@ -130,12 +132,40 @@ document.getElementById('paletteAutoButton')?.addEventListener('click', () => {
     if (originalImage) processImage();
 });
 
+document.getElementById('uploadPaletteButton')?.addEventListener('click', () => {
+    document.getElementById('paletteFileInput').click();
+});
+
+document.getElementById('paletteFileInput')?.addEventListener('change', async function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+        const text = await file.text();
+        const palette = parsePaletteFile(file.name, text);
+        const existingIndex = customPalettes.findIndex(p => p.id === palette.id);
+        if (existingIndex >= 0) {
+            if (!confirm(`Palette "${palette.id}" already exists. Overwrite?`)) {
+                e.target.value = '';
+                return;
+            }
+            customPalettes[existingIndex] = palette;
+        } else {
+            customPalettes.push(palette);
+        }
+        saveCustomPalettes();
+        renderPaletteList();
+    } catch (err) {
+        alert('Failed to parse palette file: ' + err.message);
+    }
+    e.target.value = '';
+});
+
 function renderPaletteList() {
     const list = document.getElementById('paletteList');
     if (!list) return;
     list.innerHTML = '';
-    
-    allPalettes.forEach(p => {
+
+    function createPaletteCard(p, isCustom) {
         const card = document.createElement('div');
         card.className = 'palette-card';
         card.onclick = () => {
@@ -145,9 +175,23 @@ function renderPaletteList() {
             if (originalImage) processImage();
         };
 
+        if (isCustom) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = 'x';
+            deleteBtn.title = 'Delete custom palette';
+            deleteBtn.onclick = (ev) => {
+                ev.stopPropagation();
+                if (confirm(`Delete custom palette "${p.id}"?`)) {
+                    deleteCustomPalette(p.id);
+                }
+            };
+            card.appendChild(deleteBtn);
+        }
+
         const title = document.createElement('div');
         title.innerHTML = `<strong>${p.displayName || p.id}</strong><br><small>${p.info?.author || ''}</small>`;
-        
+
         const swatches = document.createElement('div');
         swatches.className = 'swatches';
         p.colors.slice(0, 32).forEach(c => {
@@ -159,7 +203,27 @@ function renderPaletteList() {
 
         card.appendChild(title);
         card.appendChild(swatches);
-        list.appendChild(card);
+        return card;
+    }
+
+    if (customPalettes.length > 0) {
+        const customTitle = document.createElement('div');
+        customTitle.className = 'palette-section-title';
+        customTitle.textContent = 'Custom Palettes';
+        list.appendChild(customTitle);
+
+        customPalettes.forEach(p => {
+            list.appendChild(createPaletteCard(p, true));
+        });
+    }
+
+    const builtinTitle = document.createElement('div');
+    builtinTitle.className = 'palette-section-title';
+    builtinTitle.textContent = 'Built-in Palettes';
+    list.appendChild(builtinTitle);
+
+    allPalettes.forEach(p => {
+        list.appendChild(createPaletteCard(p, false));
     });
 }
 
@@ -361,7 +425,187 @@ async function loadPalettes() {
         });
         
         palettesLoaded = true;
+        loadCustomPalettes();
     } catch (e) { console.error(e); }
 }
 
 loadPalettes();
+
+// Custom Palette Persistence
+function loadCustomPalettes() {
+    try {
+        const stored = localStorage.getItem(CUSTOM_PALETTES_KEY);
+        if (stored) {
+            customPalettes = JSON.parse(stored);
+        }
+    } catch (e) {
+        customPalettes = [];
+    }
+}
+
+function saveCustomPalettes() {
+    try {
+        localStorage.setItem(CUSTOM_PALETTES_KEY, JSON.stringify(customPalettes));
+    } catch (e) {
+        console.error('Failed to save custom palettes:', e);
+    }
+}
+
+function deleteCustomPalette(id) {
+    customPalettes = customPalettes.filter(p => p.id !== id);
+    saveCustomPalettes();
+    renderPaletteList();
+}
+
+// Palette File Parsers
+function hexToRgb(hex) {
+    hex = hex.replace(/^#/, '');
+    if (hex.length === 3) {
+        hex = hex.split('').map(c => c + c).join('');
+    }
+    if (hex.length !== 6) return null;
+    const n = parseInt(hex, 16);
+    if (isNaN(n)) return null;
+    return [(n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff];
+}
+
+function parseGplPalette(text, name) {
+    const lines = text.split(/\r?\n/);
+    const colors = [];
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#') || trimmed.toLowerCase().startsWith('gimp palette')) continue;
+        const parts = trimmed.split(/\s+/);
+        if (parts.length >= 3) {
+            const r = Math.min(255, Math.max(0, parseInt(parts[0], 10) || 0));
+            const g = Math.min(255, Math.max(0, parseInt(parts[1], 10) || 0));
+            const b = Math.min(255, Math.max(0, parseInt(parts[2], 10) || 0));
+            colors.push([r, g, b]);
+        }
+    }
+    if (colors.length < 2) throw new Error('Palette must contain at least 2 colors');
+    return { id: name.replace(/\.[^.]+$/, ''), displayName: name.replace(/\.[^.]+$/, ''), colors };
+}
+
+function parseJsonPalette(text, name) {
+    let data;
+    try {
+        data = JSON.parse(text);
+    } catch {
+        throw new Error('Invalid JSON format');
+    }
+
+    let colors = [];
+    let paletteName = name.replace(/\.[^.]+$/, '');
+
+    // Array of palette objects: [{id, colors}, ...]
+    if (Array.isArray(data) && data[0] && Array.isArray(data[0].colors)) {
+        data = data[0];
+    }
+
+    // Single palette object
+    if (data.id) paletteName = data.id;
+    if (data.name) paletteName = data.name;
+    if (data.displayName) paletteName = data.displayName;
+
+    if (Array.isArray(data.colors)) {
+        const first = data.colors[0];
+        if (Array.isArray(first) && first.length >= 3) {
+            colors = data.colors.map(c => [
+                Math.min(255, Math.max(0, parseInt(c[0]) || 0)),
+                Math.min(255, Math.max(0, parseInt(c[1]) || 0)),
+                Math.min(255, Math.max(0, parseInt(c[2]) || 0)),
+            ]);
+        } else if (typeof first === 'string') {
+            for (const hex of data.colors) {
+                const rgb = hexToRgb(hex);
+                if (rgb) colors.push(rgb);
+            }
+        } else if (first && typeof first === 'object') {
+            colors = data.colors.map(c => [
+                Math.min(255, Math.max(0, parseInt(c.r ?? c.red ?? c[0]) || 0)),
+                Math.min(255, Math.max(0, parseInt(c.g ?? c.green ?? c[1]) || 0)),
+                Math.min(255, Math.max(0, parseInt(c.b ?? c.blue ?? c[2]) || 0)),
+            ]);
+        }
+    } else if (Array.isArray(data) && data.length > 0) {
+        const first = data[0];
+        if (Array.isArray(first) && first.length >= 3) {
+            colors = data.map(c => [
+                Math.min(255, Math.max(0, parseInt(c[0]) || 0)),
+                Math.min(255, Math.max(0, parseInt(c[1]) || 0)),
+                Math.min(255, Math.max(0, parseInt(c[2]) || 0)),
+            ]);
+        } else if (typeof first === 'string') {
+            for (const hex of data) {
+                const rgb = hexToRgb(hex);
+                if (rgb) colors.push(rgb);
+            }
+        }
+    }
+
+    if (colors.length < 2) throw new Error('Palette must contain at least 2 colors');
+    return { id: paletteName, displayName: paletteName, colors };
+}
+
+function parseHexPalette(text, name) {
+    const lines = text.split(/\r?\n/);
+    const colors = [];
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#') && trimmed.length <= 1) continue;
+        const rgb = hexToRgb(trimmed);
+        if (rgb) colors.push(rgb);
+    }
+    if (colors.length < 2) throw new Error('Palette must contain at least 2 colors');
+    return { id: name.replace(/\.[^.]+$/, ''), displayName: name.replace(/\.[^.]+$/, ''), colors };
+}
+
+function parseTxtPalette(text, name) {
+    const lines = text.split(/\r?\n/);
+    const colors = [];
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#') && trimmed.length <= 1) continue;
+
+        // Try hex
+        const rgb = hexToRgb(trimmed);
+        if (rgb) {
+            colors.push(rgb);
+            continue;
+        }
+
+        // Try rgb(R, G, B)
+        const rgbMatch = trimmed.match(/rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)/i);
+        if (rgbMatch) {
+            colors.push([
+                Math.min(255, Math.max(0, parseInt(rgbMatch[1]))),
+                Math.min(255, Math.max(0, parseInt(rgbMatch[2]))),
+                Math.min(255, Math.max(0, parseInt(rgbMatch[3]))),
+            ]);
+            continue;
+        }
+
+        // Try R, G, B (comma-separated)
+        const parts = trimmed.split(',').map(s => s.trim());
+        if (parts.length >= 3) {
+            const r = Math.min(255, Math.max(0, parseInt(parts[0], 10) || 0));
+            const g = Math.min(255, Math.max(0, parseInt(parts[1], 10) || 0));
+            const b = Math.min(255, Math.max(0, parseInt(parts[2], 10) || 0));
+            colors.push([r, g, b]);
+        }
+    }
+    if (colors.length < 2) throw new Error('Palette must contain at least 2 colors');
+    return { id: name.replace(/\.[^.]+$/, ''), displayName: name.replace(/\.[^.]+$/, ''), colors };
+}
+
+function parsePaletteFile(filename, text) {
+    const ext = filename.split('.').pop().toLowerCase();
+    switch (ext) {
+        case 'gpl': return parseGplPalette(text, filename);
+        case 'json': return parseJsonPalette(text, filename);
+        case 'hex': return parseHexPalette(text, filename);
+        case 'txt': return parseTxtPalette(text, filename);
+        default: throw new Error(`Unsupported file format: .${ext}`);
+    }
+}
