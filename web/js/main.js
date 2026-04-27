@@ -169,10 +169,16 @@ function renderPaletteList() {
         const card = document.createElement('div');
         card.className = 'palette-card';
         card.onclick = () => {
+            console.log('[palette click]', p.displayName || p.id, 'colors:', p.colors?.length);
             selectedPalette = { name: p.displayName || p.id, colors: p.colors };
             selectedPaletteLabel.textContent = `Palette: ${selectedPalette.name}`;
             document.getElementById('paletteModal').style.display = 'none';
-            if (originalImage) processImage();
+            if (originalImage) {
+                console.log('[processImage] triggered with palette:', selectedPalette.name);
+                processImage();
+            } else {
+                console.log('[processImage] skipped: no originalImage');
+            }
         };
 
         if (isCustom) {
@@ -270,11 +276,13 @@ function processImage() {
     removeAntiAliasing(imageData, backgroundColor);
 
     if (selectedPalette) {
+        console.log('[quantize] using fixed palette:', selectedPalette.name, selectedPalette.colors.length, 'colors');
         quantizeToFixedPalette(imageData, selectedPalette.colors);
     } else {
+        console.log('[quantize] using median cut, colorCount:', colorCount);
         medianCutQuantization(imageData, colorCount);
     }
-    
+
     processedImage = imageData;
     ctx.putImageData(imageData, 0, 0);
 
