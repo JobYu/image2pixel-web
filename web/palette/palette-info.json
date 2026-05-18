@@ -323,5 +323,40 @@
       "author": "Zughy",
       "url": "https://twitter.com/_Zughy",
       "description": "32-color palette by Zughy"
+    },
+    "Perler": {
+      "author": "Perler",
+      "url": "https://github.com/maxcleme/beadcolors",
+      "description": "Perler fuse beads color palette"
+    },
+    "Perler Mini": {
+      "author": "Perler",
+      "url": "https://github.com/maxcleme/beadcolors",
+      "description": "Perler mini fuse beads color palette"
+    },
+    "Hama Midi": {
+      "author": "Hama",
+      "url": "https://github.com/maxcleme/beadcolors",
+      "description": "Hama midi fuse beads color palette"
+    },
+    "Hama Mini": {
+      "author": "Hama",
+      "url": "https://github.com/maxcleme/beadcolors",
+      "description": "Hama mini fuse beads color palette"
+    },
+    "Nabbi": {
+      "author": "Nabbi",
+      "url": "https://github.com/maxcleme/beadcolors",
+      "description": "Nabbi fuse beads color palette"
+    },
+    "Artkal S": {
+      "author": "Artkal",
+      "url": "https://github.com/maxcleme/beadcolors",
+      "description": "Artkal S (5mm) fuse beads color palette"
+    },
+    "Artkal C": {
+      "author": "Artkal",
+      "url": "https://github.com/maxcleme/beadcolors",
+      "description": "Artkal C (2.6mm) fuse beads color palette"
     }
   }

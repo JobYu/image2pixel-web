@@ -6,6 +6,7 @@
 let originalImage = null;
 let processedImage = null;
 let selectedPalette = null;
+let isBlueprintMode = false;
 let allPalettes = [];
 let palettesLoaded = false;
 const CUSTOM_PALETTES_KEY = 'image2pixel_custom_palettes';
@@ -129,6 +130,7 @@ document.getElementById('paletteAutoButton')?.addEventListener('click', () => {
     selectedPalette = null;
     selectedPaletteLabel.textContent = '';
     document.getElementById('paletteModal').style.display = 'none';
+    updateBlueprintCheckboxVisibility();
     if (originalImage) processImage();
 });
 
@@ -170,9 +172,10 @@ function renderPaletteList() {
         card.className = 'palette-card';
         card.onclick = () => {
             console.log('[palette click]', p.displayName || p.id, 'colors:', p.colors?.length);
-            selectedPalette = { name: p.displayName || p.id, colors: p.colors };
+            selectedPalette = { name: p.displayName || p.id, colors: p.colors, meta: p.meta || null };
             selectedPaletteLabel.textContent = `Palette: ${selectedPalette.name}`;
             document.getElementById('paletteModal').style.display = 'none';
+            updateBlueprintCheckboxVisibility();
             if (originalImage) {
                 console.log('[processImage] triggered with palette:', selectedPalette.name);
                 processImage();
@@ -292,6 +295,7 @@ function processImage() {
 
     resultInfo.textContent = `${width}x${height}`;
     updateButtonStates();
+    updateBlueprintCheckboxVisibility();
 }
 
 // Helper Functions
@@ -399,6 +403,22 @@ function drawGrid(canvas, blockSize) {
 
 function saveImage() {
     if (!processedImage) return;
+
+    if (isBlueprintMode && selectedPalette && selectedPalette.meta && selectedPalette.meta.codeMap) {
+        const blockSize = parseInt(document.getElementById('blockSize').value) || 6;
+        const grid = extract1x1Grid(processedImage, blockSize);
+        const patternCanvas = renderBeadPattern(grid, selectedPalette.meta);
+        if (!patternCanvas) {
+            alert('Failed to generate bead pattern');
+            return;
+        }
+        const link = document.createElement('a');
+        link.download = `bead-pattern-${selectedPalette.meta.brand || 'unknown'}.png`;
+        link.href = patternCanvas.toDataURL();
+        link.click();
+        return;
+    }
+
     const temp = document.createElement('canvas');
     temp.width = processedImage.width; temp.height = processedImage.height;
     temp.getContext('2d').putImageData(processedImage, 0, 0);
@@ -424,7 +444,7 @@ async function loadPalettes() {
         const [pRes, iRes] = await Promise.all([fetch('palette/palettes.json'), fetch('palette/palette-info.json')]);
         const palettes = await pRes.json();
         const info = await iRes.json();
-        
+
         // Map info and sort: wplace first, then others alphabetically
         allPalettes = palettes.map(p => ({ ...p, info: info[p.id] || {} }));
         allPalettes.sort((a, b) => {
@@ -432,7 +452,38 @@ async function loadPalettes() {
             if (b.id === 'wplace') return 1;
             return (a.displayName || a.id).localeCompare(b.displayName || b.id);
         });
-        
+
+        // Load bead palettes
+        try {
+            const beadPkgRes = await fetch('palette/bead-palettes/package.json');
+            if (beadPkgRes.ok) {
+                const beadPkg = await beadPkgRes.json();
+                if (beadPkg.contributes && beadPkg.contributes.palettes) {
+                    const beadPalettes = [];
+                    for (const bp of beadPkg.contributes.palettes) {
+                        try {
+                            const res = await fetch(`palette/bead-palettes/${bp.path.replace('./', '')}`);
+                            if (res.ok) {
+                                const data = await res.json();
+                                beadPalettes.push({
+                                    id: bp.id,
+                                    displayName: bp.id,
+                                    colors: data.colors,
+                                    meta: data.meta || null,
+                                    info: { author: data.meta?.brand || '', description: 'Fuse Bead Palette' },
+                                });
+                            }
+                        } catch (e) {
+                            console.warn(`Failed to load bead palette: ${bp.id}`, e);
+                        }
+                    }
+                    allPalettes = [...beadPalettes, ...allPalettes];
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to load bead palette package', e);
+        }
+
         palettesLoaded = true;
     } catch (e) { console.error(e); }
     loadCustomPalettes();
@@ -481,19 +532,49 @@ function hexToRgb(hex) {
 function parseGplPalette(text, name) {
     const lines = text.split(/\r?\n/);
     const colors = [];
+    const meta = { brand: null, codeMap: {} };
+    let lastColorKey = null;
+
     for (const line of lines) {
         const trimmed = line.trim();
-        if (!trimmed || trimmed.startsWith('#') || trimmed.toLowerCase().startsWith('gimp palette')) continue;
+
+        if (trimmed.startsWith('# META:')) {
+            const content = trimmed.substring(7).trim();
+            const eqIndex = content.indexOf('=');
+            if (eqIndex > 0) {
+                const key = content.substring(0, eqIndex).trim();
+                const value = content.substring(eqIndex + 1).trim();
+                if (key === 'brand') meta.brand = value;
+            }
+            continue;
+        }
+
+        if (trimmed.startsWith('# CODE:')) {
+            const code = trimmed.substring(7).trim();
+            if (lastColorKey) meta.codeMap[lastColorKey] = code;
+            continue;
+        }
+
+        if (!trimmed || trimmed.startsWith('#') || trimmed.toLowerCase().startsWith('gimp palette') || trimmed.toLowerCase().startsWith('name:') || trimmed.toLowerCase().startsWith('columns:')) continue;
+
         const parts = trimmed.split(/\s+/);
         if (parts.length >= 3) {
             const r = Math.min(255, Math.max(0, parseInt(parts[0], 10) || 0));
             const g = Math.min(255, Math.max(0, parseInt(parts[1], 10) || 0));
             const b = Math.min(255, Math.max(0, parseInt(parts[2], 10) || 0));
             colors.push([r, g, b]);
+            lastColorKey = `${r},${g},${b}`;
         }
     }
     if (colors.length < 2) throw new Error('Palette must contain at least 2 colors');
-    return { id: name.replace(/\.[^.]+$/, ''), displayName: name.replace(/\.[^.]+$/, ''), colors };
+
+    const hasMeta = meta.brand || Object.keys(meta.codeMap).length > 0;
+    return {
+        id: name.replace(/\.[^.]+$/, ''),
+        displayName: name.replace(/\.[^.]+$/, ''),
+        colors,
+        ...(hasMeta ? { meta } : {}),
+    };
 }
 
 function parseJsonPalette(text, name) {
@@ -554,7 +635,7 @@ function parseJsonPalette(text, name) {
     }
 
     if (colors.length < 2) throw new Error('Palette must contain at least 2 colors');
-    return { id: paletteName, displayName: paletteName, colors };
+    return { id: paletteName, displayName: paletteName, colors, ...(data.meta ? { meta: data.meta } : {}) };
 }
 
 function parseHexPalette(text, name) {
@@ -617,4 +698,173 @@ function parsePaletteFile(filename, text) {
         case 'txt': return parseTxtPalette(text, filename);
         default: throw new Error(`Unsupported file format: .${ext}`);
     }
+}
+
+// --- Bead Blueprint Functions ---
+
+const MIN_CELL_SIZE = 44;
+const HEADER_HEIGHT = 32;
+
+function updateBlueprintCheckboxVisibility() {
+    const toggle = document.getElementById('blueprintToggle');
+    if (!toggle) return;
+
+    const hasCodeMap = selectedPalette && selectedPalette.meta && selectedPalette.meta.codeMap && Object.keys(selectedPalette.meta.codeMap).length > 0;
+    const show = hasCodeMap && processedImage !== null;
+
+    toggle.style.display = show ? 'inline-flex' : 'none';
+    if (!hasCodeMap) {
+        const cb = document.getElementById('blueprintCheckbox');
+        if (cb) cb.checked = false;
+        isBlueprintMode = false;
+    }
+}
+
+document.getElementById('blueprintCheckbox')?.addEventListener('change', function() {
+    isBlueprintMode = this.checked;
+});
+
+function extractShortCode(fullCode) {
+    if (!fullCode) return '';
+    // Extract numeric part after letter prefix (P01→1, H01→1, S199→199)
+    const match = fullCode.match(/([A-Za-z]*)(\d+)/);
+    if (match) {
+        return String(parseInt(match[2], 10));
+    }
+    return fullCode;
+}
+
+function getContrastColor(r, g, b) {
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+    return yiq >= 150 ? '#000000' : '#FFFFFF';
+}
+
+function extract1x1Grid(imageData, blockSize) {
+    const src = imageData.data;
+    const w = imageData.width;
+    const h = imageData.height;
+    const gridW = Math.ceil(w / blockSize);
+    const gridH = Math.ceil(h / blockSize);
+
+    const result = new ImageData(gridW, gridH);
+    for (let gy = 0; gy < gridH; gy++) {
+        for (let gx = 0; gx < gridW; gx++) {
+            const srcX = Math.min(gx * blockSize + Math.floor(blockSize / 2), w - 1);
+            const srcY = Math.min(gy * blockSize + Math.floor(blockSize / 2), h - 1);
+            const srcIdx = (srcY * w + srcX) * 4;
+
+            const dstIdx = (gy * gridW + gx) * 4;
+            result.data[dstIdx] = src[srcIdx];
+            result.data[dstIdx + 1] = src[srcIdx + 1];
+            result.data[dstIdx + 2] = src[srcIdx + 2];
+            result.data[dstIdx + 3] = 255;
+        }
+    }
+    return result;
+}
+
+function renderBeadPattern(gridImageData, paletteMeta) {
+    if (!gridImageData || !paletteMeta || !paletteMeta.codeMap) return null;
+
+    const { width: gridW, height: gridH } = gridImageData;
+    const data = gridImageData.data;
+    const cellSize = MIN_CELL_SIZE;
+
+    // Font size: 3-digit number width must not exceed 12px
+    const fontSize = 7;
+
+    const canvasW = gridW * cellSize;
+    const canvasH = gridH * cellSize + HEADER_HEIGHT;
+
+    const patternCanvas = document.createElement('canvas');
+    patternCanvas.width = canvasW;
+    patternCanvas.height = canvasH;
+    const pCtx = patternCanvas.getContext('2d');
+
+    // Draw brand header
+    pCtx.fillStyle = '#f5f5f5';
+    pCtx.fillRect(0, 0, canvasW, HEADER_HEIGHT);
+    pCtx.fillStyle = '#333333';
+    pCtx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    pCtx.textAlign = 'left';
+    pCtx.textBaseline = 'middle';
+    pCtx.fillText(`${paletteMeta.brand || 'Bead'} Pattern`, 12, HEADER_HEIGHT / 2);
+
+    // Build fast lookup: color key → { r, g, b, fullCode }
+    const colorEntries = [];
+    for (const [key, fullCode] of Object.entries(paletteMeta.codeMap)) {
+        const [r, g, b] = key.split(',').map(Number);
+        colorEntries.push({ r, g, b, key, fullCode });
+    }
+
+    // Nearest-color lookup with cache
+    const codeCache = new Map();
+    function findCode(r, g, b) {
+        const key = `${r},${g},${b}`;
+        if (codeCache.has(key)) return codeCache.get(key);
+
+        let minDist = Infinity;
+        let bestCode = null;
+        for (const entry of colorEntries) {
+            const dr = r - entry.r;
+            const dg = g - entry.g;
+            const db = b - entry.b;
+            const dist = dr * dr + dg * dg + db * db;
+            if (dist < minDist) {
+                minDist = dist;
+                bestCode = entry.fullCode;
+            }
+        }
+        codeCache.set(key, bestCode);
+        return bestCode;
+    }
+
+    // Draw grid cells
+    const fontStr = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    for (let y = 0; y < gridH; y++) {
+        for (let x = 0; x < gridW; x++) {
+            const idx = (y * gridW + x) * 4;
+            const r = data[idx];
+            const g = data[idx + 1];
+            const b = data[idx + 2];
+
+            const px = x * cellSize;
+            const py = y * cellSize + HEADER_HEIGHT;
+
+            // 1. Fill background color (snap to nearest palette color)
+            const fullCode = findCode(r, g, b);
+            if (fullCode) {
+                const snapKey = Object.entries(paletteMeta.codeMap).find(([, v]) => v === fullCode)?.[0];
+                if (snapKey) {
+                    const [sr, sg, sb] = snapKey.split(',').map(Number);
+                    pCtx.fillStyle = `rgb(${sr},${sg},${sb})`;
+                } else {
+                    pCtx.fillStyle = `rgb(${r},${g},${b})`;
+                }
+            } else {
+                pCtx.fillStyle = `rgb(${r},${g},${b})`;
+            }
+            pCtx.fillRect(px, py, cellSize, cellSize);
+
+            // 2. Draw code number
+            if (fullCode) {
+                const code = extractShortCode(fullCode);
+                // Use snapped color for contrast calculation
+                const snapKey = Object.entries(paletteMeta.codeMap).find(([, v]) => v === fullCode)?.[0];
+                const [cr, cg, cb] = snapKey ? snapKey.split(',').map(Number) : [r, g, b];
+                pCtx.fillStyle = getContrastColor(cr, cg, cb);
+                pCtx.font = fontStr;
+                pCtx.textAlign = 'center';
+                pCtx.textBaseline = 'middle';
+                pCtx.fillText(code, px + cellSize / 2, py + cellSize / 2);
+            }
+
+            // 3. Draw grid border
+            pCtx.strokeStyle = 'rgba(0,0,0,0.2)';
+            pCtx.lineWidth = 1;
+            pCtx.strokeRect(px + 0.5, py + 0.5, cellSize - 1, cellSize - 1);
+        }
+    }
+
+    return patternCanvas;
 }

@@ -1,0 +1,38 @@
+{
+  "name": "bead-palettes",
+  "displayName": "Fuse Bead Palettes",
+  "description": "Color palettes for popular fuse bead brands",
+  "version": "1.0",
+  "contributes": {
+    "palettes": [
+      {
+        "id": "Perler",
+        "path": "./perler.json"
+      },
+      {
+        "id": "Perler Mini",
+        "path": "./perler-mini.json"
+      },
+      {
+        "id": "Hama Midi",
+        "path": "./hama-midi.json"
+      },
+      {
+        "id": "Hama Mini",
+        "path": "./hama-mini.json"
+      },
+      {
+        "id": "Nabbi",
+        "path": "./nabbi.json"
+      },
+      {
+        "id": "Artkal S",
+        "path": "./artkal-s.json"
+      },
+      {
+        "id": "Artkal C",
+        "path": "./artkal-c.json"
+      }
+    ]
+  }
+}
