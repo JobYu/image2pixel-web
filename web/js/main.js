@@ -770,9 +770,6 @@ function renderBeadPattern(gridImageData, paletteMeta) {
     const data = gridImageData.data;
     const cellSize = MIN_CELL_SIZE;
 
-    // Font size: 3-digit number width must not exceed 12px
-    const fontSize = 7;
-
     const canvasW = gridW * cellSize;
     const canvasH = gridH * cellSize + HEADER_HEIGHT;
 
@@ -819,8 +816,23 @@ function renderBeadPattern(gridImageData, paletteMeta) {
         return bestCode;
     }
 
+    // Compute optimal font size: each number string width must not exceed 12px
+    const MAX_NUMBER_WIDTH = 12;
+    let widestShortCode = '';
+    for (const [, fullCode] of Object.entries(paletteMeta.codeMap)) {
+        const sc = extractShortCode(fullCode);
+        if (sc.length > widestShortCode.length) widestShortCode = sc;
+    }
+    let fontSize = 10;
+    const fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    pCtx.font = `bold ${fontSize}px ${fontFamily}`;
+    while (pCtx.measureText(widestShortCode || '999').width > MAX_NUMBER_WIDTH && fontSize > 6) {
+        fontSize--;
+        pCtx.font = `bold ${fontSize}px ${fontFamily}`;
+    }
+
     // Draw grid cells
-    const fontStr = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    const fontStr = `bold ${fontSize}px ${fontFamily}`;
     for (let y = 0; y < gridH; y++) {
         for (let x = 0; x < gridW; x++) {
             const idx = (y * gridW + x) * 4;
