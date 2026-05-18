@@ -10,8 +10,13 @@ A web-based tool that converts regular images into pixel art with customizable s
 
 ## Version
 
-Current version: v1.0.4
+Current version: v1.0.5
 
+
+v1.0.5
+
+- Added support for perler bead (拼豆) blueprint export
+- Added 7 built-in fuse bead brand palettes (Perler, Hama, Nabbi, Artkal)
 
 v1.0.4
 
