@@ -816,17 +816,12 @@ function renderBeadPattern(gridImageData, paletteMeta) {
         return bestCode;
     }
 
-    // Compute optimal font size: each number string width must not exceed 12px
-    const MAX_NUMBER_WIDTH = 12;
-    let widestShortCode = '';
-    for (const [, fullCode] of Object.entries(paletteMeta.codeMap)) {
-        const sc = extractShortCode(fullCode);
-        if (sc.length > widestShortCode.length) widestShortCode = sc;
-    }
-    let fontSize = 10;
+    // Compute optimal font size: each single digit width must not exceed 12px
+    const MAX_DIGIT_WIDTH = 12;
+    let fontSize = 18; // enlarged ~80% from previous 10px baseline
     const fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
     pCtx.font = `bold ${fontSize}px ${fontFamily}`;
-    while (pCtx.measureText(widestShortCode || '999').width > MAX_NUMBER_WIDTH && fontSize > 6) {
+    while (pCtx.measureText('8').width > MAX_DIGIT_WIDTH && fontSize > 8) {
         fontSize--;
         pCtx.font = `bold ${fontSize}px ${fontFamily}`;
     }
