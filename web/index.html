@@ -28,6 +28,8 @@
     <meta property="twitter:image" content="https://image2pixel.app/logo.png">
     <link rel="canonical" href="https://image2pixel.app/">
     <link rel="alternate" hreflang="en" href="https://image2pixel.app/">
+    <link rel="alternate" hreflang="zh-Hans" href="https://image2pixel.app/">
+    <link rel="alternate" hreflang="zh-Hant" href="https://image2pixel.app/">
     <link rel="alternate" hreflang="x-default" href="https://image2pixel.app/">
     <link rel="stylesheet" href="css/style.css">
     <!-- Schema.org markup for Google+ -->
@@ -54,7 +56,7 @@
     <header class="main-header">
         <div class="header-container">
             <div class="header-left">
-                <button class="menu-toggle" id="menuToggle" title="Menu">
+                <button class="menu-toggle" id="menuToggle" data-i18n-title="title.menu" title="Menu">
                     <svg viewBox="0 0 24 24" width="24" height="24">
                         <path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
                     </svg>
@@ -80,7 +82,7 @@
                         d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
                 </svg>
             </button>
-            <span class="menu-title">MENU</span>
+            <span class="menu-title" data-i18n="menu.title">MENU</span>
         </div>
         <div class="menu-content">
             <a href="index.html" class="active">
@@ -88,21 +90,21 @@
                     <path fill="currentColor"
                         d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9s1.5.67 1.5 1.5S7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
                 </svg>
-                Pixel Art Converter
+                <span data-i18n="nav.converter">Pixel Art Converter</span>
             </a>
             <a href="pixel-text-generator.html">
                 <svg viewBox="0 0 24 24" width="20" height="20">
                     <path fill="currentColor"
                         d="M12.75 3h-1.5L2 12l1.75 1.75L12 5.5l8.25 8.25L22 12l-9.25-9zM12 18.25L3.75 10 2 11.75 11.25 21h1.5L22 11.75 20.25 10 12 18.25z" />
                 </svg>
-                Pixel Font
+                <span data-i18n="nav.font">Pixel Font</span>
             </a>
             <a href="support.html">
                 <svg viewBox="0 0 24 24" width="20" height="20">
                     <path fill="currentColor"
                         d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z" />
                 </svg>
-                Support
+                <span data-i18n="nav.support">Support</span>
             </a>
         </div>
     </nav>
@@ -110,8 +112,8 @@
 
     <main class="container">
         <section class="hero-section">
-            <h2 class="hero-title">Convert Image to Pixel Art</h2>
-            <p class="hero-description">The Pixel Art Converter instantly converts images to pixel art and photos to
+            <h2 class="hero-title" data-i18n="hero.title">Convert Image to Pixel Art</h2>
+            <p class="hero-description" data-i18n="hero.description">The Pixel Art Converter instantly converts images to pixel art and photos to
                 pixelated graphics.</p>
         </section>
 
@@ -119,7 +121,7 @@
             <div class="controls-panel">
                 <div class="settings-row">
                     <div class="control-item">
-                        <label for="blockSize">Block Size:</label>
+                        <label for="blockSize" data-i18n="control.blockSize">Block Size:</label>
                         <div class="slider-container">
                             <input type="range" id="blockSize" min="2" max="20" value="6">
                             <input type="number" id="blockSizeInput" class="number-input" min="2" max="20" value="6">
@@ -127,7 +129,7 @@
                     </div>
 
                     <div class="control-item">
-                        <label for="colorCount">Color Count:</label>
+                        <label for="colorCount" data-i18n="control.colorCount">Color Count:</label>
                         <div class="slider-container">
                             <input type="range" id="colorCount" min="2" max="64" value="32">
                             <input type="number" id="colorCountInput" class="number-input" min="2" max="64" value="32">
@@ -137,16 +139,16 @@
                     <div class="control-item">
                         <label for="showGrid" class="checkbox-label">
                             <input type="checkbox" id="showGrid">
-                            Show Grid
+                            <span data-i18n="control.showGrid">Show Grid</span>
                         </label>
                     </div>
 
                     <div class="control-item mobile-only-open">
-                        <label for="imageInputMobile" class="button primary" title="Open">
+                        <label for="imageInputMobile" class="button primary" data-i18n-title="title.open" title="Open">
                             <svg viewBox="0 0 24 24" width="18" height="18">
                                 <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                             </svg>
-                            Open Image
+                            <span data-i18n="control.openImage">Open Image</span>
                         </label>
                         <input type="file" id="imageInputMobile" accept="image/*" style="display: none;">
                     </div>
@@ -158,11 +160,11 @@
                 <div class="preview-box original">
                     <div class="box-header">
                         <div class="header-title-group">
-                            <h3>Original Image</h3>
+                            <h3 data-i18n="preview.original">Original Image</h3>
                             <span class="info-tag" id="originalInfo">0x0</span>
                         </div>
                         <div class="box-actions">
-                            <label for="imageInput" class="button primary small-button" title="Open">
+                            <label for="imageInput" class="button primary small-button" data-i18n-title="title.open" title="Open">
                                 <svg viewBox="0 0 24 24" width="16" height="16">
                                     <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
                                 </svg>
@@ -176,37 +178,37 @@
                                 <path fill="#ccc"
                                     d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
                             </svg>
-                            <p>Click + Open image to start</p>
+                            <p data-i18n="preview.placeholder">Click + Open image to start</p>
                         </div>
                     </div>
                 </div>
                 <div class="preview-box result">
                     <div class="box-header">
                         <div class="header-title-group">
-                            <h3>Pixel Art</h3>
+                            <h3 data-i18n="preview.pixelArt">Pixel Art</h3>
                             <span class="info-tag" id="resultInfo">0x0</span>
                         </div>
                         <div class="box-actions">
                             <div class="icon-buttons-group">
                                 <label id="blueprintToggle" class="checkbox-label blueprint-toggle" style="display:none;">
                                     <input type="checkbox" id="blueprintCheckbox">
-                                    <span>Blueprint</span>
+                                    <span data-i18n="preview.blueprint">Blueprint</span>
                                 </label>
-                                <button id="paletteButton" class="button small-button" title="Palette">
+                                <button id="paletteButton" class="button small-button" data-i18n-title="title.palette" title="Palette">
                                     <svg viewBox="0 0 24 24" width="16" height="16">
                                         <path fill="currentColor"
                                             d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9s1.5.67 1.5 1.5S7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" />
                                     </svg>
                                 </button>
                                 <button id="saveButton" onclick="saveImage()" class="button primary small-button"
-                                    title="Save">
+                                    data-i18n-title="title.save" title="Save">
                                     <svg viewBox="0 0 24 24" width="16" height="16">
                                         <path fill="currentColor"
                                             d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" />
                                     </svg>
                                 </button>
                                 <button id="printButton" onclick="printImage()" class="button small-button"
-                                    title="Print">
+                                    data-i18n-title="title.print" title="Print">
                                     <svg viewBox="0 0 24 24" width="16" height="16">
                                         <path fill="currentColor"
                                             d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z" />
@@ -224,34 +226,34 @@
 
         <section class="content-layer">
             <div class="info-section">
-                <h2>How to Use Pixel Art Converter</h2>
+                <h2 data-i18n="content.howToTitle">How to Use Pixel Art Converter</h2>
                 <div class="steps-grid">
                     <div class="step-card">
                         <div class="step-num">1</div>
-                        <p><strong>Upload:</strong> Click the "Open" button in the Original Image box to select an
+                        <p data-i18n-html="content.step1"><strong>Upload:</strong> Click the "Open" button in the Original Image box to select an
                             image. We support JPG, PNG, and WebP formats.</p>
                     </div>
                     <div class="step-card">
                         <div class="step-num">2</div>
-                        <p><strong>Adjust:</strong> Use the "Block Size" slider to control the pixel density. A larger
+                        <p data-i18n-html="content.step2"><strong>Adjust:</strong> Use the "Block Size" slider to control the pixel density. A larger
                             block size creates a more abstract, retro look.</p>
                     </div>
                     <div class="step-card">
                         <div class="step-num">3</div>
-                        <p><strong>Palette:</strong> Choose from dozens of built-in palettes like GameBoy or NES to give
+                        <p data-i18n-html="content.step3"><strong>Palette:</strong> Choose from dozens of built-in palettes like GameBoy or NES to give
                             your art an authentic retro feel.</p>
                     </div>
                     <div class="step-card">
                         <div class="step-num">4</div>
-                        <p><strong>Export:</strong> Once satisfied, click "Save" in the Pixel Art box to download your
+                        <p data-i18n-html="content.step4"><strong>Export:</strong> Once satisfied, click "Save" in the Pixel Art box to download your
                             masterpiece as a PNG file.</p>
                     </div>
                 </div>
             </div>
 
             <div class="info-section">
-                <h2>Why Use Our Pixel Art Maker?</h2>
-                <p>Our online <strong>pixel art converter</strong> uses advanced quantization algorithms to transform
+                <h2 data-i18n="content.whyTitle">Why Use Our Pixel Art Maker?</h2>
+                <p data-i18n-html="content.whyBody">Our online <strong>pixel art converter</strong> uses advanced quantization algorithms to transform
                     any photo into stunning pixelated graphics. It's the perfect tool for creating <strong>perler bead
                         patterns</strong> (拼豆圖紙), 8-bit game assets, or unique digital art. Whether you're a game
                     developer looking for placeholder assets, or a DIY enthusiast designing <strong>fuse bead
@@ -259,33 +261,33 @@
             </div>
 
             <div class="info-section faq">
-                <h2>Frequently Asked Questions</h2>
+                <h2 data-i18n="faq.title">Frequently Asked Questions</h2>
                 <details open>
-                    <summary>Is this pixel art tool free to use?</summary>
-                    <p>Yes! image2pixel is a free online tool for everyone. We also offer a full desktop version on
+                    <summary data-i18n="faq.q1">Is this pixel art tool free to use?</summary>
+                    <p data-i18n="faq.a1">Yes! image2pixel is a free online tool for everyone. We also offer a full desktop version on
                         Steam for professional users who need batch processing and more advanced features.</p>
                 </details>
                 <details open>
-                    <summary>How do I get the best results?</summary>
-                    <p>Start with images that have clear subjects and high contrast. Avoid images with too much fine
+                    <summary data-i18n="faq.q2">How do I get the best results?</summary>
+                    <p data-i18n="faq.a2">Start with images that have clear subjects and high contrast. Avoid images with too much fine
                         detail or noise, as they may look cluttered when pixelated.</p>
                 </details>
                 <details open>
-                    <summary>What does the Palette option do?</summary>
-                    <p>The palette option forces the converter to use a specific set of colors. This is essential for
+                    <summary data-i18n="faq.q3">What does the Palette option do?</summary>
+                    <p data-i18n="faq.a3">The palette option forces the converter to use a specific set of colors. This is essential for
                         creating art that looks like it belongs on specific vintage hardware like the Atari 2600 or the
                         original GameBoy.</p>
                 </details>
                 <details open>
-                    <summary>Which perler bead brands are supported?</summary>
-                    <p>We currently support 7 built-in fuse bead palettes from popular brands: <strong>Perler</strong>,
+                    <summary data-i18n="faq.q4">Which perler bead brands are supported?</summary>
+                    <p data-i18n-html="faq.a4">We currently support 7 built-in fuse bead palettes from popular brands: <strong>Perler</strong>,
                         <strong>Perler Mini</strong>, <strong>Hama Midi</strong>, <strong>Hama Mini</strong>,
                         <strong>Nabbi</strong>, <strong>Artkal S (5mm)</strong>, and <strong>Artkal C (2.6mm)</strong>.
                         Click the palette button in the result panel and scroll down to the "Fuse Bead Palettes" section to choose a brand.</p>
                 </details>
                 <details open>
-                    <summary>How do I export a perler bead blueprint?</summary>
-                    <p>After uploading an image and selecting a fuse bead palette (e.g., Perler or Hama), a
+                    <summary data-i18n="faq.q5">How do I export a perler bead blueprint?</summary>
+                    <p data-i18n-html="faq.a5">After uploading an image and selecting a fuse bead palette (e.g., Perler or Hama), a
                         <strong>Blueprint</strong> checkbox appears in the result panel header. Check it, then click
                         <strong>Save</strong>. The downloaded PNG will be a numbered grid where each cell shows the
                         bead's official color code, perfect for following while building your project.</p>
@@ -316,7 +318,7 @@
                         <a href="https://store.steampowered.com/app/3475120" target="_blank" rel="noopener nofollow"
                             class="footer-btn steam-btn">
                             <img src="https://store.steampowered.com/favicon.ico" alt="Steam" width="16" height="16">
-                            Steam
+                            <span data-i18n="footer.steam">Steam</span>
                         </a>
                         <a href="https://apps.apple.com/us/app/image2pixel/id6745822733" target="_blank"
                             rel="noopener nofollow" class="footer-btn badge-btn">
@@ -327,27 +329,29 @@
                             <img src="AndroidAPKBadge.svg" alt="Google Play" height="24">
                         </a>
                         <a href="image2pixel-picker-chrome-web-store-v0.1.3.zip" class="footer-btn">
-                            Chrome Extension
+                            <span data-i18n="footer.chromeExtension">Chrome Extension</span>
                         </a>
                         <a href="https://image2pixel-help.pages.dev/" target="_blank" rel="noopener"
                             class="footer-btn help-btn">
                             <span class="help-icon-circle">?</span>
-                            Help
+                            <span data-i18n="footer.help">Help</span>
                         </a>
                     </div>
                 </div>
-                <div class="language-selector">
-                    <a href="#" class="active">EN</a>
+                <div class="language-selector" id="languageSelector" role="navigation" aria-label="Language">
+                    <a href="#" data-locale="en" class="active" aria-current="true">EN</a>
+                    <a href="#" data-locale="zh-CN">简</a>
+                    <a href="#" data-locale="zh-TW">繁</a>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 <a href="https://image2pixel.app">image2pixel.app</a>. All rights reserved.</p>
+                <p>&copy; 2026 <a href="https://image2pixel.app">image2pixel.app</a>. <span data-i18n="footer.copyright">All rights reserved.</span></p>
                 <div class="legal-links">
-                    <a href="EULA_iOS_Image2pixel.html">iOS Terms</a>
-                    <a href="EULA_Android_Image2pixel.html">Android Terms</a>
-                    <a href="privacy-policy.html">Privacy Policy</a>
-                    <a href="chrome-extension-privacy-policy.html">Chrome Extension Privacy Policy</a>
-                    <a href="support.html">Support</a>
+                    <a href="EULA_iOS_Image2pixel.html" data-i18n-href="href:EULA_iOS_Image2pixel.html" data-i18n="footer.iosTerms">iOS Terms</a>
+                    <a href="EULA_Android_Image2pixel.html" data-i18n-href="href:EULA_Android_Image2pixel.html" data-i18n="footer.androidTerms">Android Terms</a>
+                    <a href="privacy-policy.html" data-i18n-href="href:privacy-policy.html" data-i18n="footer.privacy">Privacy Policy</a>
+                    <a href="chrome-extension-privacy-policy.html" data-i18n="footer.chromePrivacy">Chrome Extension Privacy Policy</a>
+                    <a href="support.html" data-i18n="footer.support">Support</a>
                 </div>
             </div>
         </div>
@@ -356,21 +360,22 @@
     <div id="paletteModal" class="modal" style="display:none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Choose Palette</h3>
+                <h3 data-i18n="modal.choosePalette">Choose Palette</h3>
                 <button id="closePaletteModal" class="close-button">&times;</button>
             </div>
             <div class="modal-toolbar">
-                <button id="paletteAutoButton" class="button secondary">Auto (No Palette)</button>
-                <button id="uploadPaletteButton" class="button secondary">Upload Custom Palette</button>
+                <button id="paletteAutoButton" class="button secondary" data-i18n="modal.auto">Auto (No Palette)</button>
+                <button id="uploadPaletteButton" class="button secondary" data-i18n="modal.upload">Upload Custom Palette</button>
                 <input type="file" id="paletteFileInput" accept=".gpl,.json,.hex,.txt" style="display:none;">
             </div>
-            <p class="palette-hint">Supports: .gpl (GIMP), .json, .hex, .txt</p>
+            <p class="palette-hint" data-i18n="modal.hint">Supports: .gpl (GIMP), .json, .hex, .txt</p>
             <div id="paletteList" class="palette-list">
                 <!-- dynamically populated -->
             </div>
         </div>
     </div>
 
+    <script src="js/i18n.js"></script>
     <script src="js/main.js"></script>
 </body>
 

@@ -3,6 +3,10 @@
  * Copyright (c) 2024 image2pixel.app. All Rights Reserved.
  */
 
+function t(key, params) {
+    return window.image2pixelI18n?.t(key, params) ?? key;
+}
+
 let originalImage = null;
 let processedImage = null;
 let selectedPalette = null;
@@ -36,6 +40,22 @@ function updateButtonStates() {
 
 updateButtonStates();
 
+function updateSelectedPaletteLabel() {
+    if (!selectedPaletteLabel) return;
+    if (selectedPalette) {
+        selectedPaletteLabel.textContent = t('palette.label', { name: selectedPalette.name });
+    } else {
+        selectedPaletteLabel.textContent = '';
+    }
+}
+
+window.addEventListener('image2pixel:localechange', () => {
+    updateSelectedPaletteLabel();
+    if (document.getElementById('paletteList')) renderPaletteList();
+    const loading = document.querySelector('#originalImageContainer .loading');
+    if (loading) loading.textContent = t('loading.processing');
+});
+
 // Menu Logic
 function toggleMenu(show) {
     if (show) {
@@ -66,7 +86,7 @@ imageInputs.forEach(id => {
         updateButtonStates();
         
         const container = document.getElementById('originalImageContainer');
-        if (container) container.innerHTML = '<div class="loading">Processing...</div>';
+        if (container) container.innerHTML = `<div class="loading">${t('loading.processing')}</div>`;
 
         const reader = new FileReader();
         reader.onload = function(event) {
@@ -146,7 +166,7 @@ document.getElementById('paletteFileInput')?.addEventListener('change', async fu
         const palette = parsePaletteFile(file.name, text);
         const existingIndex = customPalettes.findIndex(p => p.id === palette.id);
         if (existingIndex >= 0) {
-            if (!confirm(`Palette "${palette.id}" already exists. Overwrite?`)) {
+            if (!confirm(t('palette.overwriteConfirm', { id: palette.id }))) {
                 e.target.value = '';
                 return;
             }
@@ -157,7 +177,7 @@ document.getElementById('paletteFileInput')?.addEventListener('change', async fu
         saveCustomPalettes();
         renderPaletteList();
     } catch (err) {
-        alert('Failed to parse palette file: ' + err.message);
+        alert(t('palette.parseError', { message: err.message }));
     }
     e.target.value = '';
 });
@@ -173,7 +193,7 @@ function renderPaletteList() {
         card.onclick = () => {
             console.log('[palette click]', p.displayName || p.id, 'colors:', p.colors?.length);
             selectedPalette = { name: p.displayName || p.id, colors: p.colors, meta: p.meta || null };
-            selectedPaletteLabel.textContent = `Palette: ${selectedPalette.name}`;
+            updateSelectedPaletteLabel();
             document.getElementById('paletteModal').style.display = 'none';
             updateBlueprintCheckboxVisibility();
             if (originalImage) {
@@ -189,10 +209,10 @@ function renderPaletteList() {
             deleteBtn.type = 'button';
             deleteBtn.className = 'delete-btn';
             deleteBtn.textContent = 'x';
-            deleteBtn.title = 'Delete custom palette';
+            deleteBtn.title = t('palette.deleteTitle');
             deleteBtn.onclick = (ev) => {
                 ev.stopPropagation();
-                if (confirm(`Delete custom palette "${p.id}"?`)) {
+                if (confirm(t('palette.deleteConfirm', { id: p.id }))) {
                     deleteCustomPalette(p.id);
                 }
             };
@@ -219,7 +239,7 @@ function renderPaletteList() {
     if (customPalettes.length > 0) {
         const customTitle = document.createElement('div');
         customTitle.className = 'palette-section-title';
-        customTitle.textContent = 'Custom Palettes';
+        customTitle.textContent = t('palette.customSection');
         list.appendChild(customTitle);
 
         customPalettes.forEach(p => {
@@ -229,7 +249,7 @@ function renderPaletteList() {
 
     const builtinTitle = document.createElement('div');
     builtinTitle.className = 'palette-section-title';
-    builtinTitle.textContent = 'Built-in Palettes';
+    builtinTitle.textContent = t('palette.builtinSection');
     list.appendChild(builtinTitle);
 
     allPalettes.forEach(p => {
@@ -409,7 +429,7 @@ function saveImage() {
         const grid = extract1x1Grid(processedImage, blockSize);
         const patternCanvas = renderBeadPattern(grid, selectedPalette.meta);
         if (!patternCanvas) {
-            alert('Failed to generate bead pattern');
+            alert(t('bead.patternFailed'));
             return;
         }
         const link = document.createElement('a');
@@ -470,7 +490,7 @@ async function loadPalettes() {
                                     displayName: bp.id,
                                     colors: data.colors,
                                     meta: data.meta || null,
-                                    info: { author: data.meta?.brand || '', description: 'Fuse Bead Palette' },
+                                    info: { author: data.meta?.brand || '', description: t('palette.fuseBeadDesc') },
                                 });
                             }
                         } catch (e) {
@@ -785,7 +805,7 @@ function renderBeadPattern(gridImageData, paletteMeta) {
     pCtx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
     pCtx.textAlign = 'left';
     pCtx.textBaseline = 'middle';
-    pCtx.fillText(`${paletteMeta.brand || 'Bead'} Pattern`, 12, HEADER_HEIGHT / 2);
+    pCtx.fillText(t('bead.patternTitle', { brand: paletteMeta.brand || 'Bead' }), 12, HEADER_HEIGHT / 2);
 
     // Build fast lookup: color key → { r, g, b, fullCode }
     const colorEntries = [];
