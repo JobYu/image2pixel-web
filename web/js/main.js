@@ -11,6 +11,7 @@ let originalImage = null;
 let processedImage = null;
 let selectedPalette = null;
 let isBlueprintMode = false;
+let isOneToOneExport = false;
 let allPalettes = [];
 let palettesLoaded = false;
 const CUSTOM_PALETTES_KEY = 'image2pixel_custom_palettes';
@@ -313,9 +314,28 @@ function processImage() {
         drawGrid(canvas, blockSize);
     }
 
-    resultInfo.textContent = `${width}x${height}`;
+    updateResultInfo(width, height);
     updateButtonStates();
     updateBlueprintCheckboxVisibility();
+}
+
+function getLogicalGridDimensions(canvasWidth, canvasHeight, blockSize) {
+    return {
+        width: Math.ceil(canvasWidth / blockSize),
+        height: Math.ceil(canvasHeight / blockSize),
+    };
+}
+
+function updateResultInfo(canvasWidth, canvasHeight) {
+    if (!resultInfo) return;
+    const blockSize = parseInt(document.getElementById('blockSize').value) || 6;
+    const base = `${canvasWidth}x${canvasHeight}`;
+    if (isOneToOneExport && processedImage) {
+        const { width: gridW, height: gridH } = getLogicalGridDimensions(canvasWidth, canvasHeight, blockSize);
+        resultInfo.textContent = `${base} (${gridW}x${gridH} @1:1)`;
+    } else {
+        resultInfo.textContent = base;
+    }
 }
 
 // Helper Functions
@@ -424,8 +444,9 @@ function drawGrid(canvas, blockSize) {
 function saveImage() {
     if (!processedImage) return;
 
+    const blockSize = parseInt(document.getElementById('blockSize').value) || 6;
+
     if (isBlueprintMode && selectedPalette && selectedPalette.meta && selectedPalette.meta.codeMap) {
-        const blockSize = parseInt(document.getElementById('blockSize').value) || 6;
         const grid = extract1x1Grid(processedImage, blockSize);
         const patternCanvas = renderBeadPattern(grid, selectedPalette.meta);
         if (!patternCanvas) {
@@ -439,13 +460,13 @@ function saveImage() {
         return;
     }
 
-    const temp = document.createElement('canvas');
-    temp.width = processedImage.width; temp.height = processedImage.height;
-    temp.getContext('2d').putImageData(processedImage, 0, 0);
-    const link = document.createElement('a');
-    link.download = 'pixel-art.png';
-    link.href = temp.toDataURL();
-    link.click();
+    if (isOneToOneExport) {
+        const grid = extract1x1Grid(processedImage, blockSize);
+        saveImageDataAsPng(grid, `pixel-art-${grid.width}x${grid.height}.png`);
+        return;
+    }
+
+    saveImageDataAsPng(processedImage, 'pixel-art.png');
 }
 
 function printImage() {
@@ -743,6 +764,24 @@ function updateBlueprintCheckboxVisibility() {
 document.getElementById('blueprintCheckbox')?.addEventListener('change', function() {
     isBlueprintMode = this.checked;
 });
+
+document.getElementById('oneToOneCheckbox')?.addEventListener('change', function() {
+    isOneToOneExport = this.checked;
+    if (processedImage) {
+        updateResultInfo(processedImage.width, processedImage.height);
+    }
+});
+
+function saveImageDataAsPng(imageData, filename) {
+    const temp = document.createElement('canvas');
+    temp.width = imageData.width;
+    temp.height = imageData.height;
+    temp.getContext('2d').putImageData(imageData, 0, 0);
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = temp.toDataURL();
+    link.click();
+}
 
 function extractShortCode(fullCode) {
     if (!fullCode) return '';

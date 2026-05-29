@@ -10,8 +10,12 @@ A web-based tool that converts regular images into pixel art with customizable s
 
 ## Version
 
-Current version: v1.0.6
+Current version: v1.0.7
 
+
+v1.0.7
+
+- Added 1:1 export checkbox in the result panel (save one physical pixel per color block)
 
 v1.0.6
 

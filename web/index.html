@@ -65,7 +65,7 @@
             <div class="header-center">
                 <div class="brand">
                     <img src="logo.png" alt="image2pixel logo" class="header-logo">
-                    <h1>image2pixel <span class="version">v1.0.6</span></h1>
+                    <h1>image2pixel <span class="version">v1.0.7</span></h1>
                 </div>
             </div>
             <div class="header-right">
@@ -194,6 +194,10 @@
                                     <input type="checkbox" id="blueprintCheckbox">
                                     <span data-i18n="preview.blueprint">Blueprint</span>
                                 </label>
+                                <label id="oneToOneToggle" class="checkbox-label blueprint-toggle" data-i18n-title="preview.oneToOneHint" title="Save with one pixel per color block">
+                                    <input type="checkbox" id="oneToOneCheckbox">
+                                    <span data-i18n="preview.oneToOne">1:1</span>
+                                </label>
                                 <button id="paletteButton" class="button small-button" data-i18n-title="title.palette" title="Palette">
                                     <svg viewBox="0 0 24 24" width="16" height="16">
                                         <path fill="currentColor"
@@ -291,6 +295,13 @@
                         <strong>Blueprint</strong> checkbox appears in the result panel header. Check it, then click
                         <strong>Save</strong>. The downloaded PNG will be a numbered grid where each cell shows the
                         bead's official color code, perfect for following while building your project.</p>
+                </details>
+                <details open>
+                    <summary data-i18n="faq.q6">How do I save a true 1:1 pixel art file?</summary>
+                    <p data-i18n-html="faq.a6">Check the <strong>1:1</strong> checkbox in the result panel, then click
+                        <strong>Save</strong>. The downloaded PNG uses one physical pixel per color block—ideal for game
+                        sprites, further upscaling, or importing into other pixel tools. The on-screen preview stays
+                        large for easier viewing.</p>
                 </details>
             </div>
         </section>

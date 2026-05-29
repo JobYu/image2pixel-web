@@ -28,6 +28,8 @@
             'preview.pixelArt': 'Pixel Art',
             'preview.placeholder': 'Click + Open image to start',
             'preview.blueprint': 'Blueprint',
+            'preview.oneToOne': '1:1',
+            'preview.oneToOneHint': 'Save with one pixel per color block',
             'title.menu': 'Menu',
             'title.open': 'Open',
             'title.palette': 'Palette',
@@ -61,6 +63,9 @@
             'faq.q5': 'How do I export a perler bead blueprint?',
             'faq.a5':
                 'After uploading an image and selecting a fuse bead palette (e.g., Perler or Hama), a <strong>Blueprint</strong> checkbox appears in the result panel header. Check it, then click <strong>Save</strong>. The downloaded PNG will be a numbered grid where each cell shows the bead\'s official color code, perfect for following while building your project.',
+            'faq.q6': 'How do I save a true 1:1 pixel art file?',
+            'faq.a6':
+                'Check the <strong>1:1</strong> checkbox in the result panel, then click <strong>Save</strong>. The downloaded PNG uses one physical pixel per color block—ideal for game sprites, further upscaling, or importing into other pixel tools. The on-screen preview stays large for easier viewing.',
             'footer.steam': 'Steam',
             'footer.chromeExtension': 'Chrome Extension',
             'footer.help': 'Help',
@@ -124,6 +129,8 @@
             'preview.pixelArt': '像素画',
             'preview.placeholder': '点击 + 打开图片开始',
             'preview.blueprint': '拼豆图纸',
+            'preview.oneToOne': '1:1',
+            'preview.oneToOneHint': '保存时每个色块对应 1 个像素',
             'title.menu': '菜单',
             'title.open': '打开',
             'title.palette': '色板',
@@ -156,6 +163,9 @@
             'faq.q5': '如何导出拼豆图纸？',
             'faq.a5':
                 '上传图片并选择拼豆色板（如 Perler 或 Hama）后，结果面板会出现 <strong>拼豆图纸</strong> 复选框。勾选后点击 <strong>保存</strong>，下载的 PNG 为带官方色号编号的网格图，便于按图拼豆。',
+            'faq.q6': '如何保存真正的 1:1 像素画？',
+            'faq.a6':
+                '在结果面板勾选 <strong>1:1</strong>，再点击 <strong>保存</strong>。下载的 PNG 中每个色块只占 1 个物理像素，适合游戏精灵、二次放大或导入其它像素工具。屏幕预览仍保持大尺寸，便于查看。',
             'footer.steam': 'Steam',
             'footer.chromeExtension': 'Chrome 扩展',
             'footer.help': '帮助',
@@ -216,6 +226,8 @@
             'preview.pixelArt': '像素畫',
             'preview.placeholder': '點擊 + 開啟圖片開始',
             'preview.blueprint': '拼豆圖紙',
+            'preview.oneToOne': '1:1',
+            'preview.oneToOneHint': '儲存時每個色塊對應 1 個像素',
             'title.menu': '選單',
             'title.open': '開啟',
             'title.palette': '色盤',
@@ -248,6 +260,9 @@
             'faq.q5': '如何匯出拼豆圖紙？',
             'faq.a5':
                 '上傳圖片並選擇拼豆色盤（如 Perler 或 Hama）後，結果面板會出現 <strong>拼豆圖紙</strong> 核取方塊。勾選後點擊 <strong>儲存</strong>，下載的 PNG 為帶官方色號編號的格線圖，便於按圖拼豆。',
+            'faq.q6': '如何儲存真正的 1:1 像素畫？',
+            'faq.a6':
+                '在結果面板勾選 <strong>1:1</strong>，再點擊 <strong>儲存</strong>。下載的 PNG 中每個色塊只佔 1 個物理像素，適合遊戲精靈、二次放大或匯入其它像素工具。螢幕預覽仍保持大尺寸，便於查看。',
             'footer.steam': 'Steam',
             'footer.chromeExtension': 'Chrome 擴充功能',
             'footer.help': '說明',
