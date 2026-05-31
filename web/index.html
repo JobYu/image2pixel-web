@@ -143,6 +143,15 @@
                         </label>
                     </div>
 
+                    <div class="control-item">
+                        <label for="algorithm">Algorithm:</label>
+                        <select id="algorithm" class="algo-select">
+                            <option value="classic">Classic (Median Cut)</option>
+                            <option value="lab-dither">LAB + Dithering</option>
+                            <option value="tezumie">Tezumie Style</option>
+                        </select>
+                    </div>
+
                     <div class="control-item mobile-only-open">
                         <label for="imageInputMobile" class="button primary" data-i18n-title="title.open" title="Open">
                             <svg viewBox="0 0 24 24" width="18" height="18">
@@ -387,6 +396,7 @@
     </div>
 
     <script src="js/i18n.js"></script>
+    <script src="js/algorithms.js"></script>
     <script src="js/main.js"></script>
 </body>
 

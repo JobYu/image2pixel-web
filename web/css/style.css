@@ -358,6 +358,16 @@ input[type="range"] {
     cursor: pointer;
 }
 
+.algo-select {
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
 .palette-info-text {
     margin-top: 1rem;
     font-size: 0.85rem;

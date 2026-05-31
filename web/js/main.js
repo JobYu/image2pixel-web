@@ -136,6 +136,10 @@ document.getElementById('showGrid').addEventListener('change', function() {
     if (originalImage) processImage();
 });
 
+document.getElementById('algorithm')?.addEventListener('change', function() {
+    if (originalImage) processImage();
+});
+
 // Palette Modal
 paletteButton?.addEventListener('click', () => {
     const modal = document.getElementById('paletteModal');
@@ -264,6 +268,7 @@ function processImage() {
     
     const blockSize = parseInt(document.getElementById('blockSize').value) || 6;
     const colorCount = parseInt(document.getElementById('colorCount').value) || 16;
+    const algorithm = document.getElementById('algorithm')?.value || 'classic';
     
     const { width, height } = calculateScaledDimensions(originalImage.width, originalImage.height);
     canvas.width = width;
@@ -275,36 +280,69 @@ function processImage() {
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
     const backgroundColor = detectBackgroundColor(imageData);
-    
-    // Pixelate
-    for (let y = 0; y < canvas.height; y += blockSize) {
-        for (let x = 0; x < canvas.width; x += blockSize) {
-            let r=0, g=0, b=0, a=0, count=0;
-            for (let by=0; by<blockSize && y+by<canvas.height; by++) {
-                for (let bx=0; bx<blockSize && x+bx<canvas.width; bx++) {
-                    const idx = ((y+by)*canvas.width + (x+bx))*4;
-                    r += data[idx]; g += data[idx+1]; b += data[idx+2]; a += data[idx+3];
-                    count++;
+
+    if (algorithm === 'classic') {
+        // ── Classic: block-average → anti-alias removal → Median Cut / fixed palette ──
+        for (let y = 0; y < canvas.height; y += blockSize) {
+            for (let x = 0; x < canvas.width; x += blockSize) {
+                let r=0, g=0, b=0, a=0, count=0;
+                for (let by=0; by<blockSize && y+by<canvas.height; by++) {
+                    for (let bx=0; bx<blockSize && x+bx<canvas.width; bx++) {
+                        const idx = ((y+by)*canvas.width + (x+bx))*4;
+                        r += data[idx]; g += data[idx+1]; b += data[idx+2]; a += data[idx+3];
+                        count++;
+                    }
                 }
-            }
-            r=Math.round(r/count); g=Math.round(g/count); b=Math.round(b/count); a=Math.round(a/count);
-            for (let by=0; by<blockSize && y+by<canvas.height; by++) {
-                for (let bx=0; bx<blockSize && x+bx<canvas.width; bx++) {
-                    const idx = ((y+by)*canvas.width + (x+bx))*4;
-                    data[idx]=r; data[idx+1]=g; data[idx+2]=b; data[idx+3]=a;
+                r=Math.round(r/count); g=Math.round(g/count); b=Math.round(b/count); a=Math.round(a/count);
+                for (let by=0; by<blockSize && y+by<canvas.height; by++) {
+                    for (let bx=0; bx<blockSize && x+bx<canvas.width; bx++) {
+                        const idx = ((y+by)*canvas.width + (x+bx))*4;
+                        data[idx]=r; data[idx+1]=g; data[idx+2]=b; data[idx+3]=a;
+                    }
                 }
             }
         }
-    }
-    
-    removeAntiAliasing(imageData, backgroundColor);
+        removeAntiAliasing(imageData, backgroundColor);
+        if (selectedPalette) {
+            quantizeToFixedPalette(imageData, selectedPalette.colors);
+        } else {
+            medianCutQuantization(imageData, colorCount);
+        }
 
-    if (selectedPalette) {
-        console.log('[quantize] using fixed palette:', selectedPalette.name, selectedPalette.colors.length, 'colors');
-        quantizeToFixedPalette(imageData, selectedPalette.colors);
-    } else {
-        console.log('[quantize] using median cut, colorCount:', colorCount);
-        medianCutQuantization(imageData, colorCount);
+    } else if (algorithm === 'lab-dither') {
+        // ── LAB + Floyd-Steinberg: block-average → anti-alias removal → LAB dither ──
+        for (let y = 0; y < canvas.height; y += blockSize) {
+            for (let x = 0; x < canvas.width; x += blockSize) {
+                let r=0, g=0, b=0, a=0, count=0;
+                for (let by=0; by<blockSize && y+by<canvas.height; by++) {
+                    for (let bx=0; bx<blockSize && x+bx<canvas.width; bx++) {
+                        const idx = ((y+by)*canvas.width + (x+bx))*4;
+                        r += data[idx]; g += data[idx+1]; b += data[idx+2]; a += data[idx+3];
+                        count++;
+                    }
+                }
+                r=Math.round(r/count); g=Math.round(g/count); b=Math.round(b/count); a=Math.round(a/count);
+                for (let by=0; by<blockSize && y+by<canvas.height; by++) {
+                    for (let bx=0; bx<blockSize && x+bx<canvas.width; bx++) {
+                        const idx = ((y+by)*canvas.width + (x+bx))*4;
+                        data[idx]=r; data[idx+1]=g; data[idx+2]=b; data[idx+3]=a;
+                    }
+                }
+            }
+        }
+        removeAntiAliasing(imageData, backgroundColor);
+        const palette = selectedPalette
+            ? selectedPalette.colors
+            : medianCutGetPalette(imageData, colorCount);
+        processWithLabDither(imageData, blockSize, palette);
+
+    } else if (algorithm === 'tezumie') {
+        // ── Tezumie Style: nearest-neighbor center-pixel sampling → LAB FS dither ──
+        // (No averaging — preserves hard edges; dithering handles color blending)
+        const palette = selectedPalette
+            ? selectedPalette.colors
+            : medianCutGetPalette(imageData, colorCount);
+        processWithTezumie(imageData, blockSize, palette);
     }
 
     processedImage = imageData;
