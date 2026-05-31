@@ -368,6 +368,35 @@ input[type="range"] {
     cursor: pointer;
 }
 
+.algo-tag {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.6rem;
+}
+
+.algo-grid .step-card h4 {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.algo-grid .step-card p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.algo-card-highlight {
+    border-top: 3px solid var(--primary-color);
+}
+
 .palette-info-text {
     margin-top: 1rem;
     font-size: 0.85rem;
