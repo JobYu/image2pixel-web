@@ -309,6 +309,35 @@ function processImage() {
             medianCutQuantization(imageData, colorCount);
         }
 
+    } else if (algorithm === 'classic-lab') {
+        // ── Classic LAB: block-average → anti-alias removal → LAB Median Cut palette → LAB nearest-color ──
+        // No dithering. Same clean solid-color blocks as Classic, but perceptually better
+        // palette generation (Median Cut in LAB space) and color matching (LAB distance).
+        for (let y = 0; y < canvas.height; y += blockSize) {
+            for (let x = 0; x < canvas.width; x += blockSize) {
+                let r=0, g=0, b=0, a=0, count=0;
+                for (let by=0; by<blockSize && y+by<canvas.height; by++) {
+                    for (let bx=0; bx<blockSize && x+bx<canvas.width; bx++) {
+                        const idx = ((y+by)*canvas.width + (x+bx))*4;
+                        r += data[idx]; g += data[idx+1]; b += data[idx+2]; a += data[idx+3];
+                        count++;
+                    }
+                }
+                r=Math.round(r/count); g=Math.round(g/count); b=Math.round(b/count); a=Math.round(a/count);
+                for (let by=0; by<blockSize && y+by<canvas.height; by++) {
+                    for (let bx=0; bx<blockSize && x+bx<canvas.width; bx++) {
+                        const idx = ((y+by)*canvas.width + (x+bx))*4;
+                        data[idx]=r; data[idx+1]=g; data[idx+2]=b; data[idx+3]=a;
+                    }
+                }
+            }
+        }
+        removeAntiAliasing(imageData, backgroundColor);
+        const paletteClassicLab = selectedPalette
+            ? selectedPalette.colors
+            : medianCutGetPaletteInLab(imageData, colorCount);
+        processWithClassicLab(imageData, blockSize, paletteClassicLab);
+
     } else if (algorithm === 'lab-dither') {
         // ── LAB + Floyd-Steinberg: block-average → anti-alias removal → LAB dither ──
         for (let y = 0; y < canvas.height; y += blockSize) {

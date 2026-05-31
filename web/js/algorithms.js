@@ -97,6 +97,85 @@ function medianCutGetPalette(imageData, colorCount) {
 }
 
 // ============================================================
+// LAB ↔ RGB (needed for LAB-space Median Cut)
+// ============================================================
+
+function labToRgb(L, a, b) {
+    const fy = (L + 16) / 116;
+    const fx = a / 500 + fy;
+    const fz = fy - b / 200;
+    const cube = v => v ** 3 > 0.008856 ? v ** 3 : (v - 16 / 116) / 7.787037;
+    const x = cube(fx) * 0.95047;
+    const y = cube(fy) * 1.00000;
+    const z = cube(fz) * 1.08883;
+    let r =  x * 3.2404542 - y * 1.5371385 - z * 0.4985314;
+    let g = -x * 0.9692660 + y * 1.8760108 + z * 0.0415560;
+    let bv = x * 0.0556434 - y * 0.2040259 + z * 1.0572252;
+    const toSrgb = c => c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(Math.max(0, c), 1 / 2.4) - 0.055;
+    return [
+        Math.max(0, Math.min(255, Math.round(toSrgb(r) * 255))),
+        Math.max(0, Math.min(255, Math.round(toSrgb(g) * 255))),
+        Math.max(0, Math.min(255, Math.round(toSrgb(bv) * 255))),
+    ];
+}
+
+/**
+ * Median Cut entirely in CIELAB space.
+ * Splits boxes by largest perceptual range (L*, a*, b*).
+ * Averages in LAB space then converts back to RGB — produces a palette
+ * with more perceptually distinct, evenly-spread colors than RGB Median Cut.
+ */
+function medianCutGetPaletteInLab(imageData, colorCount) {
+    // Sample every 4th pixel for speed; still large enough for good statistics
+    const labPixels = [];
+    for (let i = 0; i < imageData.data.length; i += 16) {
+        labPixels.push(rgbToLab(imageData.data[i], imageData.data[i + 1], imageData.data[i + 2]));
+    }
+
+    class LabBox {
+        constructor(px) {
+            this.pixels = px;
+            let minL = Infinity, maxL = -Infinity;
+            let mina = Infinity, maxa = -Infinity;
+            let minb = Infinity, maxb = -Infinity;
+            for (const [L, a, b] of px) {
+                if (L < minL) minL = L; if (L > maxL) maxL = L;
+                if (a < mina) mina = a; if (a > maxa) maxa = a;
+                if (b < minb) minb = b; if (b > maxb) maxb = b;
+            }
+            const Lr = maxL - minL, ar = maxa - mina, br = maxb - minb;
+            this.largestRange = Math.max(Lr, ar, br);
+            this.splitChannel = Lr >= ar && Lr >= br ? 0 : ar >= br ? 1 : 2;
+        }
+        getAvgRgb() {
+            const n = this.pixels.length;
+            let L = 0, a = 0, b = 0;
+            for (const p of this.pixels) { L += p[0]; a += p[1]; b += p[2]; }
+            return labToRgb(L / n, a / n, b / n);
+        }
+        split() {
+            if (this.pixels.length < 2) return null;
+            const ch = this.splitChannel;
+            this.pixels.sort((a, b) => a[ch] - b[ch]);
+            const mid = Math.floor(this.pixels.length / 2);
+            return [new LabBox(this.pixels.slice(0, mid)), new LabBox(this.pixels.slice(mid))];
+        }
+    }
+
+    let boxes = [new LabBox(labPixels)];
+    while (boxes.length < colorCount) {
+        let idx = 0;
+        for (let i = 1; i < boxes.length; i++) {
+            if (boxes[i].largestRange > boxes[idx].largestRange) idx = i;
+        }
+        const newBoxes = boxes[idx].split();
+        if (!newBoxes) break;
+        boxes.splice(idx, 1, ...newBoxes);
+    }
+    return boxes.map(b => b.getAvgRgb());
+}
+
+// ============================================================
 // Block Grid Operations
 // ============================================================
 
@@ -213,6 +292,28 @@ function floydSteinbergDither(grid, rows, cols, labPalette) {
 // ============================================================
 // Algorithm Entry Points (called from main.js)
 // ============================================================
+
+/**
+ * Algorithm: Classic LAB (recommended for classical pixel art)
+ * - Averages blocks (clean solid-color blocks, no dithering)
+ * - Palette generated via Median Cut in CIELAB space → more perceptually
+ *   distinct colors than RGB Median Cut
+ * - Color matching uses LAB distance → nearest color is the one that
+ *   looks closest to the human eye, not just closest in RGB math
+ * Result: same clean pixel-art look as Classic, but significantly better
+ * color fidelity — especially for skin tones, gradients, and similar hues.
+ */
+function processWithClassicLab(imageData, blockSize, palette) {
+    const { grid, rows, cols } = extractBlockGridAverage(imageData, blockSize);
+    const labPalette = buildLabPalette(palette);
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const [r, g, b] = grid[row][col];
+            grid[row][col] = nearestLabColor(r, g, b, labPalette);
+        }
+    }
+    paintBlockGrid(grid, rows, cols, imageData, blockSize);
+}
 
 /**
  * Algorithm: LAB + Floyd-Steinberg Dithering
