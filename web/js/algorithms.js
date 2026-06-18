@@ -341,3 +341,21 @@ function processWithTezumie(imageData, blockSize, palette) {
     floydSteinbergDither(grid, rows, cols, labPalette);
     paintBlockGrid(grid, rows, cols, imageData, blockSize);
 }
+
+/**
+ * Algorithm: Tezumie Style (No Dither)
+ * - Nearest-neighbor center-pixel sampling (preserves sharp edges)
+ * - Builds or receives palette
+ * - NO dithering — hard color blocks, clean pixel-art look
+ */
+function processWithTezumieNoDither(imageData, blockSize, palette) {
+    const { grid, rows, cols } = extractBlockGridNearest(imageData, blockSize);
+    const labPalette = buildLabPalette(palette);
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const [r, g, b] = grid[row][col];
+            grid[row][col] = nearestLabColor(r, g, b, labPalette);
+        }
+    }
+    paintBlockGrid(grid, rows, cols, imageData, blockSize);
+}

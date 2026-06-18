@@ -372,6 +372,14 @@ function processImage() {
             ? selectedPalette.colors
             : medianCutGetPalette(imageData, colorCount);
         processWithTezumie(imageData, blockSize, palette);
+
+    } else if (algorithm === 'tezumie-no-dither') {
+        // ── Tezumie Style (No Dither): nearest-neighbor center-pixel sampling → LAB nearest-color ──
+        // (No averaging — preserves hard edges; NO dithering — clean hard-color blocks)
+        const palette = selectedPalette
+            ? selectedPalette.colors
+            : medianCutGetPalette(imageData, colorCount);
+        processWithTezumieNoDither(imageData, blockSize, palette);
     }
 
     processedImage = imageData;
